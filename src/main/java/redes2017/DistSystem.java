@@ -1,5 +1,6 @@
 package redes2017;
 
+import java.util.HashMap;
 
 public class DistSystem {
 	
@@ -11,19 +12,33 @@ public class DistSystem {
 	/**
 	 *	Number of process on the system
 	 */
-	private int process;
+	private int size;
 
 	/**
-	 *	True iff the distributed system is finished.
-	 * 	Global variable of the system, should be access sysnchonized
+	 *	This object has the ip and port of all the process.	
 	 */
-	private boolean finish;
+	private HashMap<Integer,String> sys;
 
 	/**
-	 *	Contains the global distributed array to sort.	
-	 * 	Global variable of the system, should be access sysnchonized.
+	 * 	Message manager 
 	 */
-	private DistributedArray list;
+	private Middlewar secretary;
+
+
+	/**
+	 *	Default constructor of a distribute system
+	 */
+	public DistSystem(){
+		size = 4;
+		sys = new HashMap<Integer,String>();
+		sys.put(0,"127.0.0.1:5000");
+		sys.put(1,"127.0.0.1:5001");
+		sys.put(2,"127.0.0.1:5002");
+		sys.put(3,"127.0.0.1:5003");
+		sys.put(4,"127.0.0.1:5004");
+
+	}
+
 
 	/**
 	 *	This method shuld initialize the System with some magical config 
@@ -33,35 +48,35 @@ public class DistSystem {
 		// TO-DO
 	}
 
-	private void swap () {
-		// to-do
-	}
-
-	private void barrier(){
-
-	}
-
-	private boolean andReduce(){
-		return false;
-	}
+	/**
+	 *	Swap the two elements on the 
+	 */
+	private void swap(int e1,int e2) {
+		// TO-DO
+	}	
 
 	public void DistributedSort() {
+	// /**
+	//  *	True iff the distributed system is finished.
+	//  * 	Global variable of the system, should be access sysnchonized
+	//  */		
+
 		this.init();
-		list = new DistributedArray(4000);
-		finish = false;
+		DistributedArray list = new DistributedArray(40);
+		boolean finish = false;
 		while (! finish) {
 			finish = true;
 			list.bubbleSort(this.pid);
-			// barrier, ver!
+			secretary.barrier();
 
-			if (this.pid != this.process-1) {
+			if (this.pid != this.size-1) {
 				if (list.getVal(list.upperIndex(this.pid)) > list.getVal(list.lowerIndex(this.pid))) {
-					this.swap();
+					this.swap(list.upperIndex(this.pid),list.lowerIndex(this.pid));
 					finish = false;
 				}
 			}
-			
-			finish = this.andReduce();
+
+			finish = secretary.andReduce();
 		}
 
 	}

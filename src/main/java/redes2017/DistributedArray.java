@@ -6,8 +6,10 @@ public class DistributedArray{
 
 	private int partitions;
 
-	public DistributedArray(int vaules){
+	private DistSystem sys;
 
+	public DistributedArray(int vaules){
+		// TO-DO
 	}
 
 	/**
@@ -15,33 +17,32 @@ public class DistributedArray{
 	 * 	@return the value on the given index.
 	 */
 	public int getVal(int index){
-		//TO -DO
 		return 0;
 	}
 
 	/**
-	 *	@param process int that represents a process 
+	 *	@param procId int that represents a process 
 	 *  @return the lower index on this process
 	 */ 
-	public int lowerIndex(int process){
+	public int lowerIndex(int procId){
 		// TO-DO
 		return 0;
 	}
 
 	/**
-	 *	@param process int that represents a process 
+	 *	@param procId int that represents a process 
 	 *  @return the higher index on this process
-	 */ 
-	public int upperIndex(int process){
+	 */
+	public int upperIndex(int procId){
 		// TO-DO
 		return 0;
 	}
 
 	/**
 	 *	Sort the array memory available on the process
-	 *	@param process int that represents a process 
+	 *	@param procId int that represents a process 
 	 */
-	public void bubbleSort(int process){
+	public void bubbleSort(int procId){
 		// TO-DO
 	}
 
