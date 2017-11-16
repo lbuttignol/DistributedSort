@@ -5,10 +5,12 @@ public class DistributedArray{
 	private int length;
 
 	private int partitions;
+	/**
+	 * 	Message manager 
+	 */
+	private Middlewar secretary;
 
-	private DistSystem sys;
-
-	public DistributedArray(int vaules){
+	public DistributedArray(int vaules, DistSystem ){
 		// TO-DO
 	}
 
@@ -17,6 +19,7 @@ public class DistributedArray{
 	 * 	@return the value on the given index.
 	 */
 	public int getVal(int index){
+
 		return 0;
 	}
 
@@ -48,3 +51,14 @@ public class DistributedArray{
 
 
 }
+
+
+// get i
+// getrest i v 
+// set i 
+
+// barrier b
+// continue
+
+// reduce
+// reduceresp n

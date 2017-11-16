@@ -1,6 +1,18 @@
 package redes2017;
 
+import java.net.DatagramSocket;
+
 public class Middlewar {
+
+	private DistSystem system;
+
+	private DatagramSocket soket;
+
+	private int index;
+
+	public Middlewar(int procNumber, DistSystem info){
+		this.soket = new DatagramSocket(); 
+	}	
 
 	/**
 	 *	the first process coordinates that everyone arrives at the barrier 
@@ -20,7 +32,7 @@ public class Middlewar {
 	/**
 	 *	
 	 */
-	public void sendTo(String ip_Port, String mes){
+	public void sendTo(int procNumber, String message){
 		// TO-DO
 
 	}
