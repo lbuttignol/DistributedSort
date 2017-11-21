@@ -10,7 +10,7 @@ public class DistributedArray{
 	 */
 	private Middlewar secretary;
 
-	public DistributedArray(int vaules, DistSystem ){
+	public DistributedArray(int vaules, DistSystem system){
 		// TO-DO
 	}
 
@@ -52,13 +52,3 @@ public class DistributedArray{
 
 }
 
-
-// get i
-// getrest i v 
-// set i 
-
-// barrier b
-// continue
-
-// reduce
-// reduceresp n

@@ -1,5 +1,9 @@
 # My first distributed system #
 
-*to compile*
+*To compile*
 
 mvn compile
+
+*To run the project*
+
+mvn exec:java

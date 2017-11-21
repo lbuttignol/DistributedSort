@@ -1,14 +1,17 @@
 package redes2017;
+
+import java.net.InetAddress;
+
 public class Process {
 	private Integer id;
-	private String ip;
+	private InetAddress ip;
 	private Integer port;
 
 	public void setId(Integer val){
 		this.id = val;
 	}
 	
-	public void setIp(String val){
+	public void setIp(InetAddress val){
 		this.ip = val;
 	}
 	
@@ -16,7 +19,7 @@ public class Process {
 		this.port = val;
 	}
 	
-	public String getIp(){
+	public InetAddress getIp(){
 		return this.ip;
 	}
 	

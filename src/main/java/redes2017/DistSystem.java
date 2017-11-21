@@ -7,22 +7,19 @@ public class DistSystem {
 	/**
 	 *	Number of this particular process
 	 */
-	private int pid;
+	private Integer pid;
 
 	/**
 	 *	Number of process on the system
 	 */
-	private int size;
+	private Integer size;
 
 	/**
 	 *	This object has the ip and port of all the process.	
 	 */
 	private HashMap<Integer,String> sys;
 
-	/**
-	 * 	Message manager 
-	 */
-	private Middlewar secretary;
+
 
 
 	/**
@@ -39,7 +36,10 @@ public class DistSystem {
 
 	}
 
-
+	public void setPid(Integer val){
+		this.pid = val;
+	}
+	
 	/**
 	 *	This method shuld initialize the System with some magical config 
 	 *  file recived from main 
@@ -55,19 +55,19 @@ public class DistSystem {
 		// TO-DO
 	}	
 
-	public void DistributedSort() {
+	public void DistributedSort(DistributedArray list) {
 	// /**
 	//  *	True iff the distributed system is finished.
 	//  * 	Global variable of the system, should be access sysnchonized
 	//  */		
 
 		this.init();
-		DistributedArray list = new DistributedArray(40);
+		// DistributedArray list = new DistributedArray(40,);
 		boolean finish = false;
 		while (! finish) {
 			finish = true;
 			list.bubbleSort(this.pid);
-			secretary.barrier();
+			// secretary.barrier();
 
 			if (this.pid != this.size-1) {
 				if (list.getVal(list.upperIndex(this.pid)) > list.getVal(list.lowerIndex(this.pid))) {
@@ -76,7 +76,7 @@ public class DistSystem {
 				}
 			}
 
-			finish = secretary.andReduce();
+			// finish = secretary.andReduce();
 		}
 
 	}
