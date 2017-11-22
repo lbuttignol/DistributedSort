@@ -10,27 +10,21 @@ import java.net.SocketException;
 
 public class Middlewar extends Thread {
 
-	private Process p;
+	private Integer procId;
 
 	private DistSystem system;
 
-	private DatagramSocket soket;
+	private DatagramSocket socket;
 
-	private int index;
-
-	/**
-	 *	Only a test attribute
-	 */
-	@Deprecated
-	private int port;
-
-	@Deprecated
-	public Middlewar(int port){
-		this.port = port;
-	}
-
-	public Middlewar(int procNumber, DistSystem info) throws SocketException,SecurityException {
-		this.soket = new DatagramSocket(); 
+	public Middlewar(int procNumber, DistSystem info) {
+		System.out.println("Starting Middlewar " + procNumber);
+		this. procId = procNumber;
+		this.system = info;
+		try{
+			this.socket = new DatagramSocket(); 
+		}catch (Exception e) {
+			System.out.println("Something was wrong building a Middlewar " + procNumber);
+		}
 	}	
 
 	/**
@@ -52,14 +46,24 @@ public class Middlewar extends Thread {
 	 *	
 	 */
 	public void sendTo(int procNumber, String message){
-		// TO-DO
+		
+		Process receiver = system.getProcess(procNumber);
 
+		byte[] sendData = new byte[1024];
+		sendData = message.getBytes();
+
+		DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length,  receiver.getIp(), receiver.getPort());
+		try{
+			this.socket.send(sendPacket);
+		}catch (IOException e) {
+			System.out.println("Error sending a message to: " + procNumber);		
+		}
 	}
 
 	/**
 	 *	
 	 */
-	public String receiveFrom(String ip_Port){
+	public String receiveFrom(int procNumber){
 		// TO-DO
 		return "";
 	}
@@ -68,8 +72,17 @@ public class Middlewar extends Thread {
 	 *	
 	 */
 	public String receive(){
-		// TO-DO
-		return "";
+		byte[] receiveData = new byte[1024];
+		DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+		
+		try{
+			this.socket.receive(receivePacket);
+		}catch (IOException e) {
+			System.out.println("Panic !!! socket.receive fail.");
+		}
+		
+		String message = new String( receivePacket.getData());
+		return message;
 	}
 
 	/**
@@ -77,43 +90,16 @@ public class Middlewar extends Thread {
 	 */
 	@Override
 	public void run() {
-
-		try{
-			this.soket = new DatagramSocket(this.port);
-		}catch (SocketException e) {
-			System.out.println("ERROR_1");
-		}catch (SecurityException e) {
-			System.out.println("ERROR_2");
-			
-		}
-
-		byte[] receiveData = new byte[1024];
-		byte[] sendData = new byte[1024];
-
-		DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-		try{
-			this.soket.receive(receivePacket);
-			System.out.println("aa-----------------ERROR_1");
-			System.out.println("aa-----------------ERROR_2");
-		}catch (IOException e) {
-			System.out.println("ERROR_3");
-		}
-		
-			System.out.println("aa-----------------ERROR_3");
-		String sentence = new String( receivePacket.getData());
-		System.out.println("RECEIVED: " + sentence);
-		InetAddress IPAddress = receivePacket.getAddress();
-		int port = receivePacket.getPort();
-		String capitalizedSentence = sentence.toUpperCase();
-		sendData = capitalizedSentence.getBytes();
-		DatagramPacket sendPacket =
-		new DatagramPacket(sendData, sendData.length, IPAddress, port);
-		try{
-			this.soket.send(sendPacket);
-		}catch (IOException e) {
-			System.out.println("ERROR_4");
+		if (this.procId == 0){
+			sendTo(this.procId +1 , "Hey! I am 0 .");
+		}else {
+			String m = receive();
+			System.out.println("I am " + this.procId + "Someone send: " + m);
+			sendTo(this.procId +1, "The other guy are talking. I am " + this.procId );
 		}
 		// while(true){
+		// 	String message = this.receive();
+		// 	System.out.println(message);
 
 		// }
 	}
