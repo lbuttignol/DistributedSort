@@ -11,12 +11,14 @@
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
         <version>1.6.0</version>
+        
         <configuration>
           <mainClass>redes2017.App</mainClass>
-          <arguments>
-            <argument>argument1</argument>
-          </arguments>
+         <!--  <arguments>
+            <argument>-Dexec.args</argument>
+          </arguments> -->
         </configuration>
+      
       </plugin>
     </plugins>
   </build>

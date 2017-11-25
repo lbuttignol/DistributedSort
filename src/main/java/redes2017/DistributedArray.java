@@ -10,8 +10,9 @@ public class DistributedArray{
 	 */
 	private Middlewar secretary;
 
-	public DistributedArray(int vaules, DistSystem system){
-		// TO-DO
+	public DistributedArray(int vaules, Middlewar mid ){
+		this.secretary = mid;
+		// 
 	}
 
 	/**
