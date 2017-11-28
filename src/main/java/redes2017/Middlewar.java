@@ -13,24 +13,51 @@ import java.util.HashMap;
 
 public class Middlewar extends Thread {
 
+	/**
+	 *
+	 */
 	private Integer procId;
 
+	/**
+	 *
+	 */
 	private DistSystem system;
 
+	/**
+	 *
+	 */
 	private DatagramSocket socket;
 
+	/**
+	 *
+	 */
 	private Listener ear;
 
+	/**
+	 *
+	 */
 	private static Integer coordinator = 0;
 
+	/**
+	 *
+	 */
 	private HashMap<String,DistributedArray> registry;
 
+	/**
+	 *
+	 */
 	private BlockingQueue<String> mailbox;
 
+	/**
+	 *
+	 */
 	public DistSystem getSys(){
 		return this.system;
 	}
 
+	/**
+	 *
+	 */
 	public Middlewar(Integer procNumber, DistSystem info) {
 		System.out.println("Starting Middlewar " + procNumber);
 		this.procId = procNumber;
@@ -48,11 +75,16 @@ public class Middlewar extends Thread {
 		this.registry = new HashMap<String,DistributedArray>();
 	}	
 
-
+	/**
+	 *
+	 */
 	public BlockingQueue<String> getMailbox(){
 		return this.mailbox;
 	}
 
+	/**
+	 *
+	 */
 	public void bind(String name, DistributedArray ref){
 		this.registry.put(name,ref);
 	}

@@ -6,17 +6,46 @@ import java.util.Collections;
 
 public class DistributedArray{
 	
+	/**
+	 *	Total length of the distributed array
+	 */
 	private Integer totalLength;
 
+	/**
+	 *	Elements on this part of the distributed array  
+	 */
 	private Integer localLength;
 
+	/**
+	 *	List of elements on this part of the array  
+	 */
 	private ArrayList<Integer> list;
 
+	/**
+	 *	Number of parts that have the distributed array  
+	 */
 	private Integer partitions;
 
+	/**
+	 *	This number indicate the order of this partition on the global array  
+	 */
 	private Integer procId;
 
+	/**
+	 *	Quantity of elements added to the last partition 
+	 */
 	private Integer resto;
+
+	/**
+	 *	Internal name of the array, this shoild be unique. 
+	 */
+	private String name;
+
+	/**
+	 *	Counter of DistributedArray instances. This is for create the name of the instance. 
+	 */
+	private static Integer counter = 0;
+
 	/**
 	 * 	Message manager 
 	 */
@@ -31,6 +60,10 @@ public class DistributedArray{
 		this.secretary   = mid;
 		this.procId  	 = this.secretary.whoAmI();
 		this.totalLength = val;
+
+		//name treatment
+		this.name = "a" + this.counter.toString();
+		this.counter++;
 
 		DistSystem sys 	 = this.secretary.getSys();
 		this.partitions  = sys.size();
@@ -72,15 +105,20 @@ public class DistributedArray{
 	}
 
 	/**
-	 *
+	 *	Change the value on the given index with val
+	 *	@param index to set on the array 
+	 *	@param val value to put on the index 
 	 */
 	public void setValue(Integer index, Integer val){
 		if (!this.rightIndex(index)) {
 			throw new IndexOutOfBoundsException("Index out of bound on setValue");
 		}
-		if (this.isHere(index)) {
-			// TO-DO
+		if (!this.isHere(index)) {
+			this.secretary.sendTo(this.whoGotIt(index), "SET " + this.name + " " + index + " " + val);
+		}else {
+			this.list.set(index - this.lowerIndex(this.procId), val);
 		}
+
 	}
 
 	/**
@@ -93,7 +131,7 @@ public class DistributedArray{
 		}
 		if(!this.isHere(index)){
 
-			this.secretary.sendTo(this.whoGotIt(index) ,"GET " + "a1 " + index.toString() );
+			this.secretary.sendTo(this.whoGotIt(index) ,"GET " + this.name + " " + index.toString() );
 			throw new IllegalArgumentException("Panic !!! Error on getValue");
 		}
 		return this.list.get(index - this.lowerIndex(this.procId));
