@@ -31,6 +31,9 @@ public class Listener extends Thread{
 			String message = this.master.receive();
 			System.out.println(message);
 
+			this.master.getMailbox().add(message);
+			//enqueue some messages and othes must to be dispatched 
+
 		}
 	}
 	

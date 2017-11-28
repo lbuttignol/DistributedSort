@@ -1,53 +1,127 @@
 package redes2017;
 
+import java.lang.IndexOutOfBoundsException;
+import java.util.ArrayList;
+import java.util.Collections;
+
 public class DistributedArray{
 	
-	private int length;
+	private Integer totalLength;
 
-	private int partitions;
+	private Integer localLength;
+
+	private ArrayList<Integer> list;
+
+	private Integer partitions;
+
+	private Integer procId;
+
+	private Integer resto;
 	/**
 	 * 	Message manager 
 	 */
 	private Middlewar secretary;
 
-	public DistributedArray(int vaules, Middlewar mid ){
-		this.secretary = mid;
-		// 
+	/**
+	 *	Distributed Array constructor
+	 *	@param Values size of the array
+	 *	@param 
+	 */
+	public DistributedArray(int val, Middlewar mid ){
+		this.secretary   = mid;
+		this.procId  	 = this.secretary.whoAmI();
+		this.totalLength = val;
+
+		DistSystem sys 	 = this.secretary.getSys();
+		this.partitions  = sys.size();
+		this.resto 		 = val % partitions;
+		this.localLength = val / partitions; 
+		
+		if(resto != 0 && this.secretary.iAmLast()){
+			this.localLength += this.resto;
+		}
+		this.list = new ArrayList<Integer>(this.localLength);
+
 	}
 
 	/**
-	 *	@param index int that represent a position on the array.
+	 *	@param index on the Distributed Array
+	 *	@retrun True iff the given index is on this part of the array
+	 */
+	private boolean isHere(Integer index){
+		return index >= this.lowerIndex(this.procId) && index >= this.upperIndex(this.procId);
+	}
+
+	/**
+	 *	@param index on the Distributed Array
+	 *	@return True iff the given index belongs to the array. 
+	 */
+	private boolean rightIndex(Integer index){
+		return index >= 0 && index < this.totalLength;
+	}
+
+	/**
+	 *	@param index on the Distributed Array
+	 *	@preturn the process number that has the given index
+	 */
+	private Integer whoGotIt(Integer index){
+		if(!this.rightIndex(index)){
+			throw new IndexOutOfBoundsException("Index out of bound on whoGotIt");
+		}
+		return index * this.partitions / this.totalLength;
+	}
+
+	/**
+	 *
+	 */
+	public void setValue(Integer index, Integer val){
+		if (!this.rightIndex(index)) {
+			throw new IndexOutOfBoundsException("Index out of bound on setValue");
+		}
+		if (this.isHere(index)) {
+			// TO-DO
+		}
+	}
+
+	/**
+	 *	@param index Integer that represent a position on the array.
 	 * 	@return the value on the given index.
 	 */
-	public int getVal(int index){
+	public Integer getValue(Integer index){
+		if (!this.rightIndex(index)) {
+			throw new IndexOutOfBoundsException("Index out of bound on getValue");
+		}
+		if(!this.isHere(index)){
 
-		return 0;
+			this.secretary.sendTo(this.whoGotIt(index) ,"GET " + "a1 " + index.toString() );
+			throw new IllegalArgumentException("Panic !!! Error on getValue");
+		}
+		return this.list.get(index - this.lowerIndex(this.procId));
 	}
 
 	/**
 	 *	@param procId int that represents a process 
 	 *  @return the lower index on this process
 	 */ 
-	public int lowerIndex(int procId){
-		// TO-DO
-		return 0;
+	private int lowerIndex(int procId){
+		return this.procId * this.totalLength / this.partitions;
 	}
 
 	/**
 	 *	@param procId int that represents a process 
 	 *  @return the higher index on this process
 	 */
-	public int upperIndex(int procId){
-		// TO-DO
-		return 0;
+	private Integer upperIndex(int procId){
+		
+		return this.procId * this.totalLength / this.partitions + this.localLength - 1;
 	}
 
 	/**
 	 *	Sort the array memory available on the process
 	 *	@param procId int that represents a process 
 	 */
-	public void bubbleSort(int procId){
-		// TO-DO
+	public void sort(int procId){
+		Collections.sort(this.list);
 	}
 
 	/**

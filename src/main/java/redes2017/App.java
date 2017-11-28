@@ -21,27 +21,11 @@ class App {
 	
 	public static void main(String[] args) {
 		
-		DistSystem ds = new DistSystem();
+		DistSystem ds = new DistSystem(2);
+		Middlewar m0 = new Middlewar(Integer.parseInt(args[0]),ds);  
+		DistributedArray a = new DistributedArray(11,m0); 
 
-		System.out.println("System created." );
-		
-		System.out.println("buinding Middlewar " + Integer.parseInt(args[0]) );
-
-		
-		Middlewar m0 = new Middlewar(Integer.parseInt(args[0]),ds);
-
-		System.out.println("Middlewar created." );
-
-		m0.start();
-		
-		System.out.println("Middlewars running . . ." );
-		
-		try{
-			m0.join();
-		}catch(InterruptedException e){
-			System.out.println("Sleep broken . ");
-		}
-
+		System.out.println("Finish");
 
 	}	
 }
