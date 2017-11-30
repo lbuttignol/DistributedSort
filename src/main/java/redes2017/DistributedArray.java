@@ -150,7 +150,6 @@ public class DistributedArray{
 	 *  @return the higher index on this process
 	 */
 	private Integer upperIndex(int procId){
-		
 		return this.procId * this.totalLength / this.partitions + this.localLength - 1;
 	}
 

@@ -10,6 +10,9 @@ import java.net.SocketException;
 import java.lang.InterruptedException;
 import java.lang.SecurityException;
 
+/**
+ *	Main class on this application this run the distributed bubblesort
+ */ 
 class App {
 	/**
 	 *	This method shuld initialize the System with some magical config 

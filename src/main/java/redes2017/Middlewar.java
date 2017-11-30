@@ -11,52 +11,58 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.HashMap;
 
+/**
+ *	A middlewar is responsable for the comminucation of a distributed node.
+ *	Shuld kmow completely the system	
+ */
 public class Middlewar extends Thread {
 
 	/**
-	 *
+	 *	Number of the process.
 	 */
 	private Integer procId;
 
 	/**
-	 *
+	 *	Distributed system Information. 
 	 */
 	private DistSystem system;
 
 	/**
-	 *
+	 *	Communication channel with the other processes
 	 */
 	private DatagramSocket socket;
 
 	/**
-	 *
+	 *	Thread that listen every message
 	 */
 	private Listener ear;
 
 	/**
-	 *
+	 *	Process that coordinate important task like barriers
 	 */
 	private static Integer coordinator = 0;
 
 	/**
-	 *
+	 *	Contains the info of the DistributedArrays that can call
 	 */
 	private HashMap<String,DistributedArray> registry;
 
 	/**
-	 *
+	 *	Message queue
 	 */
 	private BlockingQueue<String> mailbox;
 
 	/**
-	 *
+	 *	
 	 */
 	public DistSystem getSys(){
 		return this.system;
 	}
 
 	/**
-	 *
+	 *	Default constructor of Middlewar
+	 *	@param	procNumber number of process on the system
+	 *	@param	info to the other nodes
 	 */
 	public Middlewar(Integer procNumber, DistSystem info) {
 		System.out.println("Starting Middlewar " + procNumber);
@@ -76,14 +82,14 @@ public class Middlewar extends Thread {
 	}	
 
 	/**
-	 *
+	 *	@return the message queue
 	 */
 	public BlockingQueue<String> getMailbox(){
 		return this.mailbox;
 	}
 
 	/**
-	 *
+	 *	Add an entry to the regisrty of arrays handled by this middlewar
 	 */
 	public void bind(String name, DistributedArray ref){
 		this.registry.put(name,ref);
@@ -97,21 +103,22 @@ public class Middlewar extends Thread {
 	}
 
 	/**
-	 *
+	 *	Method to ask if another process is the last on the system
+	 *	@return True iff procId is the last on the system.
 	 */
 	public boolean isTheLast(Integer procId){
 		return procId == this.system.size() - 1;
 	}
 	
 	/**
-	 *
+	 *	@retrun True iff is the last process on the system
 	 */
 	public boolean iAmLast(){
 		return this.procId == this.system.size() - 1;
 	}
 	
 	/**
-	 *
+	 *	@return the number of this process
 	 */	
 	public Integer whoAmI(){
 		return this.procId;

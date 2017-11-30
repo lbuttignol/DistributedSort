@@ -3,6 +3,10 @@ package redes2017;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+/**
+ *	Have the info of the distributed system, this calss know every node and
+ *	the information to communicate with everyone on this distributed system.
+ */
 public class DistSystem {
 
 	/**
@@ -12,6 +16,7 @@ public class DistSystem {
 
 	/**
 	 *	Default constructor of a distribute system
+	 *	@param procNum. Size of the distributed system
 	 */
 	public DistSystem(Integer procNum){
 		this.sys = new LinkedList<Process>();
@@ -24,7 +29,7 @@ public class DistSystem {
 	}
 
 	/**
-	 * 	@param index the id of the process to search
+	 * 	@param index the id of the process to search on the system
 	 *	@return The process with id equals to {@code index}
 	 */
 	public Process getProcess(Integer index){

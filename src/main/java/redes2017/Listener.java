@@ -1,8 +1,12 @@
 package redes2017;
 public class Listener extends Thread{
 
+	/**
+	 *	Middleware to give service.
+	 */
 	private Middlewar master;
 
+	
 	private boolean finish;
 
 	/**
@@ -30,6 +34,28 @@ public class Listener extends Thread{
 		while(!this.finish){
 			String message = this.master.receive();
 			System.out.println(message);
+
+			String[] parsedMessage = Message.parse(message);
+
+			switch (MessageType.valueOf(parsedMessage[0])) {
+				case GET: System.out.println("is a get");
+					break;
+				case GETRSP: System.out.println("is a getrsp");
+					break;
+				case SET: System.out.println("is a set");
+					break;		
+				case SETRSP: System.out.println("is a setrsp");			
+					break;		
+				case BARRIER:System.out.println("is a barrier");
+					break;		
+				case CONTINUE: System.out.println("is a CONTINUE");
+					break;		
+				case REDUCE: System.out.println("is a REDUCE");
+					break;		
+				case REDUCERSP: System.out.println("is a REDUCERSP");
+					break;	
+				
+			}
 
 			this.master.getMailbox().add(message);
 			//enqueue some messages and othes must to be dispatched 
