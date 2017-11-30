@@ -1,4 +1,10 @@
 package redes2017;
+
+/**
+ *	This is the thread that listen the messages that arrives to a
+ *  Middlewar.
+ *	@see redes2017.Middlewar.java
+ */
 public class Listener extends Thread{
 
 	/**
@@ -6,7 +12,7 @@ public class Listener extends Thread{
 	 */
 	private Middlewar master;
 
-	
+
 	private boolean finish;
 
 	/**
