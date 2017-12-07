@@ -20,12 +20,10 @@ public class DistSystem {
 	 */
 	public DistSystem(Integer procNum){
 		this.sys = new LinkedList<Process>();
-		System.out.println(this.sys.toString());
 
 		for (int i = 0; i < procNum; i++) {
 			this.sys.add(new Process(i,5000+i));
 		}
-		System.out.println(this.sys.toString());
 	}
 
 	/**

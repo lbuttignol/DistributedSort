@@ -27,30 +27,33 @@ class App {
 	private static final Integer arrayLength = 11;
 
 	public static void main(String[] args) {
-		System.out.println(nodes);
-		System.out.println(arrayLength);
 
 		DistSystem ds = new DistSystem(nodes);
 		Middlewar m0 = new Middlewar(Integer.parseInt(args[0]),ds);  
 		DistributedArray a = new DistributedArray(arrayLength,m0); 
 
 		System.out.println("sending message");
+		if (m0.whoAmI()== 0) {
+			a.set(0,5);
+			a.set(1,3);
+			a.set(2,6);
+			a.set(3,45);
+			a.set(4,6);
+			a.set(5,1);
+			// a.set(6,1);
+			// a.set(7,15);
+			// a.set(8,10);
+			// a.set(9,13);
+			// a.set(10,7);
+			// a.set(11,17);
 
-		a.set(0,5);
-		a.set(1,3);
-		a.set(2,6);
-		a.set(3,45);
-		a.set(4,6);
-		// a.set(5,1);
-		// a.set(6,1);
-		// a.set(7,15);
+			System.out.println("Final to send message ");
 
-		System.out.println("sending message2 ");
+			// for (int i=0; i<6; i++) {
+			// 	System.out.println("index "+ i +" = " +a.get(i));
+			// }
 
-		for (int i=0; i<5; i++) {
-			System.out.println("index "+ i +" = " +a.get(i));
+			m0.finish();
 		}
-
-		m0.finish();
 	}	
 }

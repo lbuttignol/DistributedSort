@@ -64,7 +64,11 @@ public class DistributedArray{
 		//name treatment
 		this.name = "a" + this.counter.toString();
 		this.counter++;
+		System.out.println(this.name);
 
+		// bind this array on the middlewar
+		this.secretary.bind(this.name,this);
+		
 		DistSystem sys 	 = this.secretary.getSys();
 		this.partitions  = sys.size();
 		this.resto 		 = val % partitions;
@@ -101,7 +105,15 @@ public class DistributedArray{
 		if(!this.rightIndex(index)){
 			throw new IndexOutOfBoundsException("Index out of bound on whoGotIt");
 		}
-		return index * this.partitions / this.totalLength;
+		System.out.println("Index out of bound on whoGotIt");
+		System.out.println("Total length "+this.totalLength);
+		System.out.println("Partitions "+this.partitions);
+		System.out.println("local length "+ this.totalLength / this.partitions);
+		int result = index / (this.totalLength / this.partitions);
+		if (result > this.partitions - 1) {
+			result = this.partitions - 1;
+		}
+		return result;
 	}
 
 	/**
@@ -109,12 +121,12 @@ public class DistributedArray{
 	 *	@param index to set on the array 
 	 *	@param val value to put on the index 
 	 */
-	public void set(Integer index, Integer val){
+	public synchronized void set(Integer index, Integer val){
+		System.out.println("-----------------------SET "+ index +" "+val);
 		if (!this.rightIndex(index)) {
 			throw new IndexOutOfBoundsException("Index out of bound on set");
 		}
 		boolean v = this.isHere(index);
-		System.out.println(v);
 		if(!this.isHere(index)) {
 			// this.secretary.sendTo(this.whoGotIt(index), "SET " + this.name + " " + index + " " + val);
 			this.secretary.sendTo(this.whoGotIt(index), MessageType.SET.toString() + " " + this.name + " " + index + " " + val);
@@ -128,7 +140,7 @@ public class DistributedArray{
 	 *	@param index Integer that represent a position on the array.
 	 * 	@return the value on the given index.
 	 */
-	public Integer get(Integer index){
+	public synchronized Integer get(Integer index){
 		if (!this.rightIndex(index)) {
 			System.out.println("IndexOutOfBoundsException---------------------------------------------------------------------");
 			// throw new IndexOutOfBoundsException("Index out of bound on get");

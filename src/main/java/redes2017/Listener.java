@@ -39,6 +39,7 @@ public class Listener extends Thread{
 		
 		while(!this.finish){
 			String message = this.master.receive();
+			System.out.println("listener receive");
 			System.out.println(message);
 
 			String[] parsedMessage = Message.parse(message);
@@ -46,8 +47,6 @@ public class Listener extends Thread{
 			String arrayName;
 			Integer index, val;
 			DistributedArray arr;
-			System.out.println(parsedMessage[0]);
-			System.out.println(MessageType.valueOf( parsedMessage[0]));
 			switch (MessageType.valueOf(parsedMessage[0].trim())) {
 				case GET: System.out.println("is a get");
 						  arrayName = parsedMessage[1];

@@ -11,7 +11,7 @@ mvn compile
 
 *To execute the project, run:*
 
-mvn exec:java
+mvn exec:java ""
 
 
 # Project Structure (In Spanish for the moment) # 
