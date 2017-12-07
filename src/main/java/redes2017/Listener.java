@@ -42,13 +42,27 @@ public class Listener extends Thread{
 			System.out.println(message);
 
 			String[] parsedMessage = Message.parse(message);
+			
+			String arrayName;
+			Integer index, val;
+			DistributedArray arr;
 
 			switch (MessageType.valueOf(parsedMessage[0])) {
 				case GET: System.out.println("is a get");
+						  arrayName = parsedMessage[1];
+						  index = Integer.parseInt(parsedMessage[2]);
+						  arr = this.master.getArray(arrayName);
+						  Integer result = arr.get(index);
+						  System.out.println("the value is " + result);
 					break;
 				case GETRSP: System.out.println("is a getrsp");
 					break;
 				case SET: System.out.println("is a set");
+						  arrayName = parsedMessage[1];
+						  index = Integer.parseInt(parsedMessage[2]);
+						  arr = this.master.getArray(arrayName);
+						  val = Integer.parseInt(parsedMessage[3].trim());
+						  arr.set(index,val);
 					break;		
 				case SETRSP: System.out.println("is a setrsp");			
 					break;		
@@ -59,7 +73,10 @@ public class Listener extends Thread{
 				case REDUCE: System.out.println("is a REDUCE");
 					break;		
 				case REDUCERSP: System.out.println("is a REDUCERSP");
-					break;	
+					break;
+				default:
+					System.out.println("Bad message! ");
+					break;
 				
 			}
 

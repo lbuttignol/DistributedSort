@@ -22,11 +22,33 @@ class App {
 		// TO-DO
 	}
 	
+	private static final Integer nodes = 2; 
+
+	private static final Integer arrayLength = 11;
+
 	public static void main(String[] args) {
-		
-		DistSystem ds = new DistSystem(2);
+		System.out.println(nodes);
+		System.out.println(arrayLength);
+
+		DistSystem ds = new DistSystem(nodes);
 		Middlewar m0 = new Middlewar(Integer.parseInt(args[0]),ds);  
-		DistributedArray a = new DistributedArray(11,m0); 
+		DistributedArray a = new DistributedArray(arrayLength,m0); 
+
+		System.out.println("sending message");
+
+		a.set(0,5);
+		a.set(1,3);
+		a.set(2,6);
+		a.set(3,45);
+		a.set(4,6);
+		a.set(5,1);
+		// a.set(6,1);
+		// a.set(7,15);
+
+
+		for (int i=0; i<arrayLength; i++) {
+			System.out.println(a.get(i));
+		}
 
 		System.out.println("Finish");
 

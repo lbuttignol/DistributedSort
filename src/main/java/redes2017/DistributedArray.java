@@ -1,7 +1,7 @@
 package redes2017;
 
 import java.lang.IndexOutOfBoundsException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 
 public class DistributedArray{
@@ -19,7 +19,7 @@ public class DistributedArray{
 	/**
 	 *	List of elements on this part of the array  
 	 */
-	private ArrayList<Integer> list;
+	private Integer[] list;
 
 	/**
 	 *	Number of parts that have the distributed array  
@@ -73,7 +73,7 @@ public class DistributedArray{
 		if(resto != 0 && this.secretary.iAmLast()){
 			this.localLength += this.resto;
 		}
-		this.list = new ArrayList<Integer>(this.localLength);
+		this.list = new Integer[localLength];
 
 	}
 
@@ -82,7 +82,7 @@ public class DistributedArray{
 	 *	@retrun True iff the given index is on this part of the array
 	 */
 	private boolean isHere(Integer index){
-		return index >= this.lowerIndex(this.procId) && index >= this.upperIndex(this.procId);
+		return index >= this.lowerIndex(this.procId) && index <= this.upperIndex(this.procId);
 	}
 
 	/**
@@ -109,14 +109,24 @@ public class DistributedArray{
 	 *	@param index to set on the array 
 	 *	@param val value to put on the index 
 	 */
-	public void setValue(Integer index, Integer val){
+	public void set(Integer index, Integer val){
+		System.out.println("Set params------------------------------------------------------------------------");
+		System.out.println(index);
+		System.out.println(val);
+		System.out.println(this.lowerIndex(this.procId));
+		System.out.println(this.upperIndex(this.procId));
 		if (!this.rightIndex(index)) {
-			throw new IndexOutOfBoundsException("Index out of bound on setValue");
+		System.out.println("Set params------------------------------------------------------------------------1");
+			throw new IndexOutOfBoundsException("Index out of bound on set");
 		}
-		if (!this.isHere(index)) {
+		boolean v = this.isHere(index);
+		System.out.println(v);
+		if(!this.isHere(index)) {
+		System.out.println("Set params------------------------------------------------------------------------12");
 			this.secretary.sendTo(this.whoGotIt(index), "SET " + this.name + " " + index + " " + val);
 		}else {
-			this.list.set(index - this.lowerIndex(this.procId), val);
+		System.out.println("Set params------------------------------------------------------------------------123");
+			this.list[index - this.lowerIndex(this.procId)] = val;
 		}
 
 	}
@@ -125,16 +135,17 @@ public class DistributedArray{
 	 *	@param index Integer that represent a position on the array.
 	 * 	@return the value on the given index.
 	 */
-	public Integer getValue(Integer index){
+	public Integer get(Integer index){
 		if (!this.rightIndex(index)) {
-			throw new IndexOutOfBoundsException("Index out of bound on getValue");
+			System.out.println("IndexOutOfBoundsException---------------------------------------------------------------------");
+			// throw new IndexOutOfBoundsException("Index out of bound on get");
 		}
 		if(!this.isHere(index)){
 
 			this.secretary.sendTo(this.whoGotIt(index) ,"GET " + this.name + " " + index.toString() );
-			throw new IllegalArgumentException("Panic !!! Error on getValue");
+			// throw new IllegalArgumentException("Panic !!! Error on get");
 		}
-		return this.list.get(index - this.lowerIndex(this.procId));
+		return this.list[index - this.lowerIndex(this.procId)];
 	}
 
 	/**
@@ -149,7 +160,7 @@ public class DistributedArray{
 	 *	@param procId int that represents a process 
 	 *  @return the higher index on this process
 	 */
-	private Integer upperIndex(int procId){
+	private Integer upperIndex(int procId){ 
 		return this.procId * this.totalLength / this.partitions + this.localLength - 1;
 	}
 
@@ -158,7 +169,7 @@ public class DistributedArray{
 	 *	@param procId int that represents a process 
 	 */
 	public void sort(int procId){
-		Collections.sort(this.list);
+		Arrays.sort(this.list);
 	}
 
 	/**
@@ -167,6 +178,18 @@ public class DistributedArray{
 	private void swap(int e1,int e2) {
 		// TO-DO
 	}	
+
+	/**
+	 *
+	 */
+	@Override
+	public String toString(){
+		return  "Array name " 	 + this.name + "\n" +
+				"global length " + this.totalLength + "\n" +
+				"local length "  + this.localLength + "\n" +
+				"node number " 	 + this.procId + "\n" +
+				"list length " 	 + this.list.length + "\n" ;
+	}
 
 	public void DistributedSort() {
 	// /**

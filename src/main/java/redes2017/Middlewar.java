@@ -96,6 +96,14 @@ public class Middlewar extends Thread {
 	}
 
 	/**
+	 *	@param name of the array on the system.
+	 *	@return the Distributed Array with that name.
+	 */
+	public DistributedArray getArray(String name){
+		return this.registry.get(name);
+	}
+
+	/**
 	 *	@return True: iff this instance coordinate all the tasks
 	 */
 	private boolean iAmCoordinator(){
@@ -172,8 +180,6 @@ public class Middlewar extends Thread {
 
 		byte[] sendData = new byte[1024];
 		sendData = message.getBytes();
-		System.out.println("LE MANDO AL : " + receiver.getIp().toString());
-		System.out.println("LE MANDO AL : " + receiver.getPort());
 		DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length,  receiver.getIp(), receiver.getPort());
 		try{
 			this.socket.send(sendPacket);
@@ -187,8 +193,6 @@ public class Middlewar extends Thread {
 	 *	@return the message received 
 	 */
 	public String receive(){
-		System.out.println("---I am " + this.procId + " Listening in : " + this.system.getProcess(this.procId).getIp().toString());
-		System.out.println("---I am " + this.procId + " Listening in : " + this.system.getProcess(this.procId).getPort());
 		
 		byte[] receiveData = new byte[1024];
 		DatagramPacket receivePacket = new DatagramPacket(receiveData, 13);
@@ -199,7 +203,6 @@ public class Middlewar extends Thread {
 			System.out.println("Panic !!! socket.receive fail.");
 		}
 		
-		System.out.println("---I am " + this.procId + "llegó el mensaje. ");
 		String message = new String(receivePacket.getData());
 		return message;
 	}
