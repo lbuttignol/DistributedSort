@@ -16,44 +16,44 @@ mvn exec:java
 
 # Project Structure (In Spanish for the moment) # 
 
-+-------------------------------------------------------+
-|   App.java                                            |
-|                                                       |
-|   +-------------------+                               |
-|   | DistSystem.java   |                               |
-|   |                   |                               |
-|   +-------------------+                               |
-|                                                       |
-|   +------------------------------+                    |
-|   | DistributedArray.java        |                    |
-|   |                              |                    |
-|   +------------------------------+                    |
-|                                                       |
-|                                                       |
-+-------------------------------------------------------+
-
-
-+-------------------------------------------------------+
-|   Middlewar.java                                      |
-|    ear                                                |
-|    +---------------+                                  |
-|    | Listener.java |                                  |
-|    |               |                                  |
-|    +---------------+                                  |
-|                                                       |
-|                                                       |
-|    registry (HashMap)                                 |
-|    +-----------------------------+                    |
-|    |  arrayName   | arrayRef     |                    |
-|    |   (String)   | (DistArray ) |                    |
-|    |              |              |                    |
-|    |              |              |                    |
-|    +-----------------------------+                    |
-|                                                       |
-|                                                       |
-|                                                       |
-|                                                       |
-+-------------------------------------------------------+
++-------------------------------------------------------+ <br />
+|   App.java                                            | <br />
+|                                                       | <br />
+|   +-------------------+                               | <br /> 
+|   | DistSystem.java   |                               | <br />
+|   |                   |                               | <br />
+|   +-------------------+                               | <br />
+|                                                       | <br />
+|   +------------------------------+                    | <br />
+|   | DistributedArray.java        |                    | <br />
+|   |                              |                    | <br />
+|   +------------------------------+                    | <br />
+|                                                       | <br />
+|                                                       | <br />
++-------------------------------------------------------+ <br />
+ <br />
+ <br />
++-------------------------------------------------------+ <br />
+|   Middlewar.java                                      | <br />
+|    ear                                                | <br />
+|    +---------------+                                  | <br />
+|    | Listener.java |                                  | <br />
+|    |               |                                  | <br />
+|    +---------------+                                  | <br />
+|                                                       | <br />
+|                                                       | <br />
+|    registry (HashMap)                                 | <br />
+|    +-----------------------------+                    | <br />
+|    |  arrayName   | arrayRef     |                    | <br />
+|    |   (String)   | (DistArray ) |                    | <br />
+|    |              |              |                    | <br />
+|    |              |              |                    | <br />
+|    +-----------------------------+                    | <br />
+|                                                       | <br />
+|                                                       | <br />
+|                                                       | <br />
+|                                                       | <br />
++-------------------------------------------------------+ <br />
 
 
 El sistema consta de una clase principal App.java, éste es el programa que va 
@@ -75,5 +75,4 @@ comunicación asincrónica requerida por los sets y gets del arreglo, en esta
 estructura se guarda como clave el nombre interno que se le asigna a un arreglo
 distribuido y como valor se deja una referencia al mismo. Ésto se hace a través
 del método bind del Middleware.java
-
 
