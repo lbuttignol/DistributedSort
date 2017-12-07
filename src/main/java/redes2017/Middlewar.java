@@ -89,6 +89,15 @@ public class Middlewar extends Thread {
 	}
 
 	/**
+	 *	This method autosend an especial message to finish the listener
+	 */ 
+	public void finish(){
+		this.ear.finish();
+		this.sendTo(this.procId, MessageType.END.toString() + " ");
+		// this.sendTo(this.procId, "END ");
+	}
+
+	/**
 	 *	Add an entry to the regisrty of arrays handled by this middlewar
 	 */
 	public void bind(String name, DistributedArray ref){

@@ -2,6 +2,7 @@ package redes2017;
 
 
 public enum MessageType{
+	END,
 	GET,
 	GETRSP,
 

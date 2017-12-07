@@ -110,22 +110,15 @@ public class DistributedArray{
 	 *	@param val value to put on the index 
 	 */
 	public void set(Integer index, Integer val){
-		System.out.println("Set params------------------------------------------------------------------------");
-		System.out.println(index);
-		System.out.println(val);
-		System.out.println(this.lowerIndex(this.procId));
-		System.out.println(this.upperIndex(this.procId));
 		if (!this.rightIndex(index)) {
-		System.out.println("Set params------------------------------------------------------------------------1");
 			throw new IndexOutOfBoundsException("Index out of bound on set");
 		}
 		boolean v = this.isHere(index);
 		System.out.println(v);
 		if(!this.isHere(index)) {
-		System.out.println("Set params------------------------------------------------------------------------12");
-			this.secretary.sendTo(this.whoGotIt(index), "SET " + this.name + " " + index + " " + val);
+			// this.secretary.sendTo(this.whoGotIt(index), "SET " + this.name + " " + index + " " + val);
+			this.secretary.sendTo(this.whoGotIt(index), MessageType.SET.toString() + " " + this.name + " " + index + " " + val);
 		}else {
-		System.out.println("Set params------------------------------------------------------------------------123");
 			this.list[index - this.lowerIndex(this.procId)] = val;
 		}
 
@@ -142,7 +135,8 @@ public class DistributedArray{
 		}
 		if(!this.isHere(index)){
 
-			this.secretary.sendTo(this.whoGotIt(index) ,"GET " + this.name + " " + index.toString() );
+			// this.secretary.sendTo(this.whoGotIt(index) , "GET " + this.name + " " + index.toString() );
+			this.secretary.sendTo(this.whoGotIt(index) , MessageType.GET.toString() +" " + this.name + " " + index.toString() );
 			// throw new IllegalArgumentException("Panic !!! Error on get");
 		}
 		return this.list[index - this.lowerIndex(this.procId)];

@@ -46,8 +46,9 @@ public class Listener extends Thread{
 			String arrayName;
 			Integer index, val;
 			DistributedArray arr;
-
-			switch (MessageType.valueOf(parsedMessage[0])) {
+			System.out.println(parsedMessage[0]);
+			System.out.println(MessageType.valueOf( parsedMessage[0]));
+			switch (MessageType.valueOf(parsedMessage[0].trim())) {
 				case GET: System.out.println("is a get");
 						  arrayName = parsedMessage[1];
 						  index = Integer.parseInt(parsedMessage[2]);
@@ -74,8 +75,10 @@ public class Listener extends Thread{
 					break;		
 				case REDUCERSP: System.out.println("is a REDUCERSP");
 					break;
-				default:
-					System.out.println("Bad message! ");
+				case END: System.out.println("Bye Bye");
+					break;
+				default:	System.out.println("Panic! on the Listener");
+
 					break;
 				
 			}

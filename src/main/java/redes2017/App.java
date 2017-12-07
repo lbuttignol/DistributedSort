@@ -41,16 +41,16 @@ class App {
 		a.set(2,6);
 		a.set(3,45);
 		a.set(4,6);
-		a.set(5,1);
+		// a.set(5,1);
 		// a.set(6,1);
 		// a.set(7,15);
 
+		System.out.println("sending message2 ");
 
-		for (int i=0; i<arrayLength; i++) {
-			System.out.println(a.get(i));
+		for (int i=0; i<5; i++) {
+			System.out.println("index "+ i +" = " +a.get(i));
 		}
 
-		System.out.println("Finish");
-
+		m0.finish();
 	}	
 }
