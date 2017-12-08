@@ -105,10 +105,7 @@ public class DistributedArray{
 		if(!this.rightIndex(index)){
 			throw new IndexOutOfBoundsException("Index out of bound on whoGotIt");
 		}
-		System.out.println("Index out of bound on whoGotIt");
-		System.out.println("Total length "+this.totalLength);
-		System.out.println("Partitions "+this.partitions);
-		System.out.println("local length "+ this.totalLength / this.partitions);
+		System.out.println("In whoGotIt --------------");
 		int result = index / (this.totalLength / this.partitions);
 		if (result > this.partitions - 1) {
 			result = this.partitions - 1;
@@ -122,7 +119,6 @@ public class DistributedArray{
 	 *	@param val value to put on the index 
 	 */
 	public synchronized void set(Integer index, Integer val){
-		System.out.println("-----------------------SET "+ index +" "+val);
 		if (!this.rightIndex(index)) {
 			throw new IndexOutOfBoundsException("Index out of bound on set");
 		}
@@ -141,14 +137,16 @@ public class DistributedArray{
 	 * 	@return the value on the given index.
 	 */
 	public synchronized Integer get(Integer index){
+		System.out.println("-----------------------GET "+ index );
 		if (!this.rightIndex(index)) {
 			System.out.println("IndexOutOfBoundsException---------------------------------------------------------------------");
-			// throw new IndexOutOfBoundsException("Index out of bound on get");
+			throw new IndexOutOfBoundsException("Index out of bound on get");
 		}
 		if(!this.isHere(index)){
 
-			// this.secretary.sendTo(this.whoGotIt(index) , "GET " + this.name + " " + index.toString() );
-			this.secretary.sendTo(this.whoGotIt(index) , MessageType.GET.toString() +" " + this.name + " " + index.toString() );
+			this.secretary.sendTo(this.whoGotIt(index) , MessageType.GET.toString() +" " + this.name + " " + index.toString() + " " + this.procId + " " );
+			String message = this.secretary.receiveFrom(this.whoGotIt(index));
+			return 0;
 			// throw new IllegalArgumentException("Panic !!! Error on get");
 		}
 		return this.list[index - this.lowerIndex(this.procId)];

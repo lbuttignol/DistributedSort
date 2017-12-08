@@ -10,6 +10,7 @@ import java.net.SocketException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.HashMap;
+import java.lang.InterruptedException;
 
 /**
  *	A middlewar is responsable for the comminucation of a distributed node.
@@ -220,8 +221,16 @@ public class Middlewar extends Thread {
 	 *	
 	 */
 	public String receiveFrom(int procNumber){
-		// TO-DO
-		return "";
+		String message = "";
+		try{
+			message = this.mailbox.take();
+		}catch(InterruptedException e){
+			System.out.println("BlockingQueue take has fail");
+			e.printStackTrace();
+		}
+		System.out.println("receiveFrom message -----------");
+		System.out.println(message);
+		return message;
 	}
 
 

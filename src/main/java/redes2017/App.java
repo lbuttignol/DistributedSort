@@ -40,7 +40,7 @@ class App {
 			a.set(3,45);
 			a.set(4,6);
 			a.set(5,1);
-			// a.set(6,1);
+			a.set(6,1);
 			// a.set(7,15);
 			// a.set(8,10);
 			// a.set(9,13);
@@ -49,6 +49,9 @@ class App {
 
 			System.out.println("Final to send message ");
 
+			System.out.println("index "+ 1 +" = " +a.get(1));
+			System.out.println("index "+ 5 +" = " +a.get(5));
+			
 			// for (int i=0; i<6; i++) {
 			// 	System.out.println("index "+ i +" = " +a.get(i));
 			// }

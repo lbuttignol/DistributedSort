@@ -16,7 +16,7 @@ public enum MessageType{
 	REDUCERSP;
 
 }
-// get arrayname indexglobal 					hacer distpaching a get del array
+// get arrayname globalIndex procSender					hacer distpaching a get del array
 // getresponse indexglobal valor 				hay que despertar siempre
 // set arrayname indexglobal value				hacer distpaching a set del array
 
