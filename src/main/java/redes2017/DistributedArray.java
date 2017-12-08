@@ -64,7 +64,7 @@ public class DistributedArray{
 		//name treatment
 		this.name = "a" + this.counter.toString();
 		this.counter++;
-		System.out.println(this.name);
+		// System.out.println(this.name);
 
 		// bind this array on the middlewar
 		this.secretary.bind(this.name,this);
@@ -105,8 +105,8 @@ public class DistributedArray{
 		if(!this.rightIndex(index)){
 			throw new IndexOutOfBoundsException("Index out of bound on whoGotIt");
 		}
-		System.out.println("In whoGotIt --------------");
 		int result = index / (this.totalLength / this.partitions);
+
 		if (result > this.partitions - 1) {
 			result = this.partitions - 1;
 		}
@@ -125,7 +125,7 @@ public class DistributedArray{
 		boolean v = this.isHere(index);
 		if(!this.isHere(index)) {
 			// this.secretary.sendTo(this.whoGotIt(index), "SET " + this.name + " " + index + " " + val);
-			this.secretary.sendTo(this.whoGotIt(index), MessageType.SET.toString() + " " + this.name + " " + index + " " + val);
+			this.secretary.sendTo(this.whoGotIt(index), MessageType.SET.toString() + " " + this.name + " " + index + " " + val + " ");
 		}else {
 			this.list[index - this.lowerIndex(this.procId)] = val;
 		}
@@ -137,17 +137,16 @@ public class DistributedArray{
 	 * 	@return the value on the given index.
 	 */
 	public synchronized Integer get(Integer index){
-		System.out.println("-----------------------GET "+ index );
+		// System.out.println("-----------------------GET "+ index );
 		if (!this.rightIndex(index)) {
-			System.out.println("IndexOutOfBoundsException---------------------------------------------------------------------");
+			// System.out.println("IndexOutOfBoundsException---------------------------------------------------------------------");
 			throw new IndexOutOfBoundsException("Index out of bound on get");
 		}
 		if(!this.isHere(index)){
 
 			this.secretary.sendTo(this.whoGotIt(index) , MessageType.GET.toString() +" " + this.name + " " + index.toString() + " " + this.procId + " " );
 			String message = this.secretary.receiveFrom(this.whoGotIt(index));
-			return 0;
-			// throw new IllegalArgumentException("Panic !!! Error on get");
+			return Integer.parseInt(Message.parse(message)[2]);
 		}
 		return this.list[index - this.lowerIndex(this.procId)];
 	}

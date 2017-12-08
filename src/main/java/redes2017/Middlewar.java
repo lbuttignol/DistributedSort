@@ -73,6 +73,7 @@ public class Middlewar extends Thread {
 			this.socket = new DatagramSocket(5000 + procNumber); 
 		}catch (Exception e) {
 			System.out.println("Something was wrong building a Middlewar " + procNumber);
+			e.printStackTrace();
 		}
 
 		this.ear = new Listener(this);
@@ -81,13 +82,6 @@ public class Middlewar extends Thread {
 		this.mailbox = new LinkedBlockingQueue<String>();
 		this.registry = new HashMap<String,DistributedArray>();
 	}	
-
-	/**
-	 *	@return the message queue
-	 */
-	public BlockingQueue<String> getMailbox(){
-		return this.mailbox;
-	}
 
 	/**
 	 *	This method autosend an especial message to finish the listener
@@ -194,7 +188,8 @@ public class Middlewar extends Thread {
 		try{
 			this.socket.send(sendPacket);
 		}catch (IOException e) {
-			System.out.println("Error sending a message to: " + procNumber);		
+			System.out.println("Error sending a message to: " + procNumber);	
+			e.printStackTrace();	
 		}
 	}
 
@@ -211,6 +206,7 @@ public class Middlewar extends Thread {
 			this.socket.receive(receivePacket);
 		}catch (IOException e) {
 			System.out.println("Panic !!! socket.receive fail.");
+			e.printStackTrace();
 		}
 		
 		String message = new String(receivePacket.getData());
@@ -221,6 +217,28 @@ public class Middlewar extends Thread {
 	 *	
 	 */
 	public String receiveFrom(int procNumber){
+		//	saco los mensajes de la cola hasta que encuentre uno que venga del procNumber
+		//  a los otros los tengo que encolar nuevamente 
+		return this.dequeueMailFrom(procNumber);
+	}
+
+	/**
+	 *	@return the message queue
+	 */
+	public BlockingQueue<String> getMailbox(){
+		return this.mailbox;
+	}
+
+	public void enqueueMail(String message){
+		try{
+			this.mailbox.put(message);
+		}catch(InterruptedException e){
+			System.out.println("Enqueue mail has failed");
+			e.printStackTrace();
+		}
+	}
+
+	public String dequeueMail(){
 		String message = "";
 		try{
 			message = this.mailbox.take();
@@ -228,11 +246,23 @@ public class Middlewar extends Thread {
 			System.out.println("BlockingQueue take has fail");
 			e.printStackTrace();
 		}
-		System.out.println("receiveFrom message -----------");
-		System.out.println(message);
 		return message;
 	}
 
+	public String dequeueMailFrom(Integer id){
+		String message = "";
+		boolean find = false;
+		while (!find) {
+			message = this.dequeueMail();
+			String[] parsedMsg = Message.parse(message);
+			if (Integer.parseInt(parsedMsg[3]) == id) {
+				find = true;
+			}else {
+				this.enqueueMail(message);
+			}
+		}
+		return message;
+	}
 
 
 

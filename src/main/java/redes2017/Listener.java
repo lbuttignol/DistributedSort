@@ -50,20 +50,16 @@ public class Listener extends Thread{
 			Integer sender;
 			switch (MessageType.valueOf(parsedMessage[0].trim())) {
 				case GET: System.out.println("is a get");
-						  System.out.println("--------------------");
 						  arrayName = parsedMessage[1];
-						  System.out.println("--------------------1");
 						  index = Integer.parseInt(parsedMessage[2]);
-						  System.out.println("--------------------12");
 						  sender = Integer.parseInt(parsedMessage[3]);
-						  System.out.println("--------------------123");
 						  arr = this.master.getArray(arrayName);
-						  System.out.println("--------------------1234");
 						  Integer result = arr.get(index);
-						  System.out.println("--------------------12345");
 						  System.out.println("the value is " + result);
+						  this.master.sendTo(sender, MessageType.GETRSP.toString() + " " + index + " " + result + " "+ this.master.whoAmI() + " ");
 					break;
 				case GETRSP: System.out.println("is a getrsp");
+							this.master.enqueueMail(message);
 					break;
 				case SET: System.out.println("is a set");
 						  arrayName = parsedMessage[1];
@@ -72,7 +68,7 @@ public class Listener extends Thread{
 						  val = Integer.parseInt(parsedMessage[3].trim());
 						  arr.set(index,val);
 					break;		
-				case SETRSP: System.out.println("is a setrsp");			
+				case SETRSP: System.out.println("is a setrsp");	
 					break;		
 				case BARRIER:System.out.println("is a barrier");
 					break;		

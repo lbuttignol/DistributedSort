@@ -32,7 +32,6 @@ class App {
 		Middlewar m0 = new Middlewar(Integer.parseInt(args[0]),ds);  
 		DistributedArray a = new DistributedArray(arrayLength,m0); 
 
-		System.out.println("sending message");
 		if (m0.whoAmI()== 0) {
 			a.set(0,5);
 			a.set(1,3);
@@ -49,12 +48,10 @@ class App {
 
 			System.out.println("Final to send message ");
 
-			System.out.println("index "+ 1 +" = " +a.get(1));
-			System.out.println("index "+ 5 +" = " +a.get(5));
 			
-			// for (int i=0; i<6; i++) {
-			// 	System.out.println("index "+ i +" = " +a.get(i));
-			// }
+			for (int i=0; i<6; i++) {
+				System.out.println("index "+ i +" = " +a.get(i));
+			}
 
 			m0.finish();
 		}
