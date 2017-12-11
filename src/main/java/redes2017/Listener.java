@@ -42,22 +42,20 @@ public class Listener extends Thread{
 			System.out.println("listener receive");
 			System.out.println(message);
 
-			String[] parsedMessage = Message.parse(message);
-			
 			String arrayName;
 			Integer index, val;
 			DistributedArray arr;
 			Integer sender;
-			switch (MessageType.valueOf(parsedMessage[0].trim())) {
+			switch (MessageType.valueOf(Message.getStringParam(message,0))) {
 				case GET: 
 					System.out.println("is a get");
-					arrayName = parsedMessage[1];
-					index = Integer.parseInt(parsedMessage[2]);
-					sender = Integer.parseInt(parsedMessage[3]);
+					arrayName = Message.getStringParam(message,1);
+					index = Message.getIntParam(message, 2);
+					sender = Message.getIntParam(message, 3);
 					arr = this.master.getArray(arrayName);
 					Integer result = arr.get(index);
 					System.out.println("the value is " + result);
-					this.master.sendTo(sender, MessageType.GETRSP.toString() + " " + index + " " + result + " " + this.master.whoAmI() + " ");
+					this.master.sendTo(sender, MessageType.GETRSP.toString() + " " + index + " " + this.master.whoAmI() + " " + result + " ");
 					break;
 
 				case GETRSP: 
@@ -67,10 +65,10 @@ public class Listener extends Thread{
 
 				case SET: 
 					System.out.println("is a set");
-					arrayName = parsedMessage[1];
-					index = Integer.parseInt(parsedMessage[2]);
+					arrayName = Message.getStringParam(message, 1);
+					index = Message.getIntParam(message, 2);
 					arr = this.master.getArray(arrayName);
-					val = Integer.parseInt(parsedMessage[3].trim());
+					val = Message.getIntParam(message, 3);
 					arr.set(index,val);
 					break;
 

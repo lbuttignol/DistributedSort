@@ -146,7 +146,7 @@ public class DistributedArray{
 
 			this.secretary.sendTo(this.whoGotIt(index) , MessageType.GET.toString() +" " + this.name + " " + index.toString() + " " + this.procId + " " );
 			String message = this.secretary.receiveFrom(this.whoGotIt(index));
-			return Integer.parseInt(Message.parse(message)[2]);
+			return Message.getIntParam(message,3);
 		}
 		return this.list[index - this.lowerIndex(this.procId)];
 	}

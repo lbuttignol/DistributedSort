@@ -34,17 +34,17 @@ class App {
 
 
 		if (m0.whoAmI()== 0) {
-			a.set(0,5);
-			a.set(1,3);
-			a.set(2,6);
-			a.set(3,45);
-			a.set(4,6);
+			// a.set(0,5);
+			// a.set(1,3);
+			// a.set(2,6);
+			// a.set(3,45);
+			// a.set(4,6);
 			a.set(5,2);
-			a.set(6,14);
+			// a.set(6,14);
 			a.set(7,15);
-			a.set(8,10);
+			// a.set(8,10);
 			a.set(9,13);
-			a.set(10,7);
+			// a.set(10,7);
 
 			System.out.println("Final to send message ");
 
