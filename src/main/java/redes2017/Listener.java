@@ -49,44 +49,54 @@ public class Listener extends Thread{
 			DistributedArray arr;
 			Integer sender;
 			switch (MessageType.valueOf(parsedMessage[0].trim())) {
-				case GET: System.out.println("is a get");
-						  arrayName = parsedMessage[1];
-						  index = Integer.parseInt(parsedMessage[2]);
-						  sender = Integer.parseInt(parsedMessage[3]);
-						  arr = this.master.getArray(arrayName);
-						  Integer result = arr.get(index);
-						  System.out.println("the value is " + result);
-						  this.master.sendTo(sender, MessageType.GETRSP.toString() + " " + index + " " + result + " "+ this.master.whoAmI() + " ");
+				case GET: 
+					System.out.println("is a get");
+					arrayName = parsedMessage[1];
+					index = Integer.parseInt(parsedMessage[2]);
+					sender = Integer.parseInt(parsedMessage[3]);
+					arr = this.master.getArray(arrayName);
+					Integer result = arr.get(index);
+					System.out.println("the value is " + result);
+					this.master.sendTo(sender, MessageType.GETRSP.toString() + " " + index + " " + result + " " + this.master.whoAmI() + " ");
 					break;
-				case GETRSP: System.out.println("is a getrsp");
-							this.master.enqueueMail(message);
+
+				case GETRSP: 
+					System.out.println("is a getrsp");
+					this.master.enqueueMail(message);
 					break;
-				case SET: System.out.println("is a set");
-						  arrayName = parsedMessage[1];
-						  index = Integer.parseInt(parsedMessage[2]);
-						  arr = this.master.getArray(arrayName);
-						  val = Integer.parseInt(parsedMessage[3].trim());
-						  arr.set(index,val);
-					break;		
+
+				case SET: 
+					System.out.println("is a set");
+					arrayName = parsedMessage[1];
+					index = Integer.parseInt(parsedMessage[2]);
+					arr = this.master.getArray(arrayName);
+					val = Integer.parseInt(parsedMessage[3].trim());
+					arr.set(index,val);
+					break;
+
 				case SETRSP: System.out.println("is a setrsp");	
-					break;		
+					break;
+
 				case BARRIER:System.out.println("is a barrier");
-					break;		
+					break;
+
 				case CONTINUE: System.out.println("is a CONTINUE");
-					break;		
+					break;
+
 				case REDUCE: System.out.println("is a REDUCE");
-					break;		
+					break;
+
 				case REDUCERSP: System.out.println("is a REDUCERSP");
 					break;
+
 				case END: System.out.println("Bye Bye");
 					break;
-				default:	System.out.println("Panic! on the Listener");
 
+				default:	System.out.println("Panic! on the Listener");
 					break;
 				
 			}
 
-			this.master.getMailbox().add(message);
 			//enqueue some messages and othes must to be dispatched 
 
 		}

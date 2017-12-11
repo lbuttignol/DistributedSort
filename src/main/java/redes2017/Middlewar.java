@@ -255,7 +255,7 @@ public class Middlewar extends Thread {
 		while (!find) {
 			message = this.dequeueMail();
 			String[] parsedMsg = Message.parse(message);
-			if (Integer.parseInt(parsedMsg[3]) == id) {
+			if (Integer.parseInt(parsedMsg[3].trim()) == id) {
 				find = true;
 			}else {
 				this.enqueueMail(message);
