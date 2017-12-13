@@ -55,11 +55,11 @@ public class Listener extends Thread{
 					arr = this.master.getArray(arrayName);
 					Integer result = arr.get(index);
 					System.out.println("the value is " + result);
-					this.master.sendTo(sender, MessageType.GETRSP.toString() + " " + index + " " + this.master.whoAmI() + " " + result + " ");
+					this.master.sendTo(sender, MessageType.GETR.toString() + " " + index + " " + this.master.whoAmI() + " " + result + " ");
 					break;
 
-				case GETRSP: 
-					System.out.println("is a getrsp");
+				case GETR: 
+					System.out.println("is a getr");
 					this.master.enqueueMail(message);
 					break;
 

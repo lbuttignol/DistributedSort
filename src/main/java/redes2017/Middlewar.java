@@ -53,6 +53,8 @@ public class Middlewar extends Thread {
 	 */
 	private BlockingQueue<String> mailbox;
 
+	private static final Integer BUFFSIZE = 2048;
+
 	/**
 	 *	
 	 */
@@ -182,7 +184,7 @@ public class Middlewar extends Thread {
 		
 		Process receiver = system.getProcess(procNumber);
 
-		byte[] sendData = new byte[1024];
+		byte[] sendData = new byte[BUFFSIZE];
 		sendData = message.getBytes();
 		DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length,  receiver.getIp(), receiver.getPort());
 		try{
@@ -199,8 +201,8 @@ public class Middlewar extends Thread {
 	 */
 	public String receive(){
 		
-		byte[] receiveData = new byte[1024];
-		DatagramPacket receivePacket = new DatagramPacket(receiveData, 13);
+		byte[] receiveData = new byte[BUFFSIZE];
+		DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
 		
 		try{
 			this.socket.receive(receivePacket);
@@ -216,9 +218,7 @@ public class Middlewar extends Thread {
 	/**
 	 *	
 	 */
-	public String receiveFrom(int procNumber){
-		//	saco los mensajes de la cola hasta que encuentre uno que venga del procNumber
-		//  a los otros los tengo que encolar nuevamente 
+	public synchronized String receiveFrom(int procNumber){
 		return this.dequeueMailFrom(procNumber);
 	}
 

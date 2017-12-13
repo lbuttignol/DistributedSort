@@ -166,7 +166,7 @@ public class DistributedArray{
 	 *	Sort the array memory available on the process
 	 *	@param procId Integer that represents a process 
 	 */
-	public void sort(Integer procId){
+	public void sort(){
 		Arrays.sort(this.list);
 	}
 
