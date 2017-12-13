@@ -56,10 +56,10 @@ public class DistributedArray{
 	 *	@param Values size of the array
 	 *	@param 
 	 */
-	public DistributedArray(int val, Middlewar mid ){
+	public DistributedArray(Integer size, Middlewar mid ){
 		this.secretary   = mid;
 		this.procId  	 = this.secretary.whoAmI();
-		this.totalLength = val;
+		this.totalLength = size;
 
 		//name treatment
 		this.name = "a" + this.counter.toString();
@@ -71,8 +71,8 @@ public class DistributedArray{
 		
 		DistSystem sys 	 = this.secretary.getSys();
 		this.partitions  = sys.size();
-		this.resto 		 = val % partitions;
-		this.localLength = val / partitions; 
+		this.resto 		 = size % partitions;
+		this.localLength = size / partitions; 
 		
 		if(resto != 0 && this.secretary.iAmLast()){
 			this.localLength += this.resto;
@@ -105,7 +105,7 @@ public class DistributedArray{
 		if(!this.rightIndex(index)){
 			throw new IndexOutOfBoundsException("Index out of bound on whoGotIt");
 		}
-		int result = index / (this.totalLength / this.partitions);
+		Integer result = index / (this.totalLength / this.partitions);
 
 		if (result > this.partitions - 1) {
 			result = this.partitions - 1;
@@ -122,14 +122,11 @@ public class DistributedArray{
 		if (!this.rightIndex(index)) {
 			throw new IndexOutOfBoundsException("Index out of bound on set");
 		}
-		boolean v = this.isHere(index);
 		if(!this.isHere(index)) {
-			// this.secretary.sendTo(this.whoGotIt(index), "SET " + this.name + " " + index + " " + val);
 			this.secretary.sendTo(this.whoGotIt(index), MessageType.SET.toString() + " " + this.name + " " + index + " " + val + " ");
 		}else {
 			this.list[index - this.lowerIndex(this.procId)] = val;
 		}
-
 	}
 
 	/**
@@ -137,9 +134,7 @@ public class DistributedArray{
 	 * 	@return the value on the given index.
 	 */
 	public synchronized Integer get(Integer index){
-		// System.out.println("-----------------------GET "+ index );
 		if (!this.rightIndex(index)) {
-			// System.out.println("IndexOutOfBoundsException---------------------------------------------------------------------");
 			throw new IndexOutOfBoundsException("Index out of bound on get");
 		}
 		if(!this.isHere(index)){
@@ -152,34 +147,39 @@ public class DistributedArray{
 	}
 
 	/**
-	 *	@param procId int that represents a process 
+	 *	@param procId Integer that represents a process 
 	 *  @return the lower index on this process
 	 */ 
-	private int lowerIndex(int procId){
+	private Integer lowerIndex(Integer procId){
 		return this.procId * this.totalLength / this.partitions;
 	}
 
 	/**
-	 *	@param procId int that represents a process 
+	 *	@param procId Integer that represents a process 
 	 *  @return the higher index on this process
 	 */
-	private Integer upperIndex(int procId){ 
+	private Integer upperIndex(Integer procId){ 
 		return this.procId * this.totalLength / this.partitions + this.localLength - 1;
 	}
 
 	/**
 	 *	Sort the array memory available on the process
-	 *	@param procId int that represents a process 
+	 *	@param procId Integer that represents a process 
 	 */
-	public void sort(int procId){
+	public void sort(Integer procId){
 		Arrays.sort(this.list);
 	}
 
 	/**
-	 *	Swap the two elements on the 
+	 *	Swap two elements on the Array
+	 *	@param e0 global index to swap
+	 *	@param e1 globat index to swap
 	 */
-	private void swap(int e1,int e2) {
-		// TO-DO
+	public synchronized void swap(Integer e0,Integer e1) {
+		Integer aux0 = this.get(e0);
+		Integer aux1 = this.get(e1);
+		this.set(e1, aux0);
+		this.set(e0, aux1);
 	}	
 
 	/**
@@ -194,31 +194,7 @@ public class DistributedArray{
 				"list length " 	 + this.list.length + "\n" ;
 	}
 
-	public void DistributedSort() {
-	// /**
-	//  *	True iff the distributed system is finished.
-	//  * 	Global variable of the system, should be access sysnchonized
-	//  */		
-
-		// this.init();
-		// // DistributedArray list = new DistributedArray(40,);
-		// boolean finish = false;
-		// while (! finish) {
-		// 	finish = true;
-		// 	list.bubbleSort(this.pid);
-		// 	// secretary.barrier();
-
-		// 	if (this.pid != this.size-1) {
-		// 		if (list.getVal(list.upperIndex(this.pid)) > list.getVal(list.lowerIndex(this.pid))) {
-		// 			this.swap(list.upperIndex(this.pid),list.lowerIndex(this.pid));
-		// 			finish = false;
-		// 		}
-		// 	}
-
-		// 	// finish = secretary.andReduce();
-		// }
-
-	}
+	
 
 }
 
