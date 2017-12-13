@@ -140,7 +140,7 @@ public class DistributedArray{
 		if(!this.isHere(index)){
 
 			this.secretary.sendTo(this.whoGotIt(index) , MessageType.GET.toString() +" " + this.name + " " + index.toString() + " " + this.procId + " " );
-			String message = this.secretary.receiveFrom(this.whoGotIt(index));
+			String message = this.secretary.receiveFrom(this.whoGotIt(index),MessageType.GETR);
 			return Message.getIntParam(message,3);
 		}
 		return this.list[index - this.lowerIndex(this.procId)];
@@ -166,7 +166,7 @@ public class DistributedArray{
 	 *	Sort the array memory available on the process
 	 *	@param procId Integer that represents a process 
 	 */
-	public void sort(){
+	public void internalSort(){
 		Arrays.sort(this.list);
 	}
 
@@ -181,6 +181,30 @@ public class DistributedArray{
 		this.set(e1, aux0);
 		this.set(e0, aux1);
 	}	
+
+	public void distributedSort() {
+	// /**
+	//  *	True iff the distributed system is finished.
+	//  * 	Global variable of the system, should be access sysnchonized
+	//  */		
+
+		boolean finish = false;
+		while (! finish) {
+			finish = true;
+			this.internalSort();
+			this.secretary.barrier();
+
+			if (this.procId != this.totalLength-1) {
+				if (this.get(this.upperIndex(this.procId)).compareTo(this.get(this.lowerIndex(this.procId))) < 0) {
+					this.swap(this.upperIndex(this.procId),this.lowerIndex(this.procId));
+					finish = false;
+				}
+			}
+
+			// finish = secretary.andReduce();
+		}
+
+	}
 
 	/**
 	 *

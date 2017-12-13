@@ -72,9 +72,6 @@ public class Listener extends Thread{
 					arr.set(index,val);
 					break;
 
-				case SETRSP: System.out.println("is a setrsp");	
-					break;
-
 				case BARRIER:System.out.println("is a barrier");
 					break;
 

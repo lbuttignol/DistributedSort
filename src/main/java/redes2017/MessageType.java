@@ -27,11 +27,22 @@ public enum MessageType{
 	 *	SET arrayName  globalIndex  value
 	 */
 	SET,
-	SETRSP,		// Not necesary
 	
-	// barrier b 			hay que encolar el mensaje 
+	/**
+	 *	A BARRIER message is to synchronise process execution, this message must
+	 *	have the folowing structure (all message attributes must be separated by a space " "):
+	 *
+	 *	BARRIER barrierId  procSender 
+	 */ 
 	BARRIER,
-	// continue				hay que despertar siempre 
+
+	/**
+	 *	A CONTINUE message is the answer to a BARRIER message, to continue the 
+	 *	program execution, this message nust have the following structure (all
+	 * 	message attributes must be separated by a space "");
+	 *
+	 *	CONTINUE  barrierId  procSender		
+	 */
 	CONTINUE,
 
 	// reduce 				hay que 

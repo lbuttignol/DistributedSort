@@ -49,6 +49,11 @@ public class Middlewar extends Thread {
 	private HashMap<String,DistributedArray> registry;
 
 	/**
+	 *	Barrier Id
+	 */
+	private Integer barrierId;
+	
+	/**
 	 *	Message queue for GETR messages
 	 */
 	private BlockingQueue<String> getMailbox;
@@ -82,6 +87,8 @@ public class Middlewar extends Thread {
 
 		this.ear = new Listener(this);
 		this.ear.start();
+
+		this.barrierId = 0;
 
 		this.getMailbox = new LinkedBlockingQueue<String>();
 		this.barrierMailbox = new LinkedBlockingQueue<String>();
@@ -158,12 +165,12 @@ public class Middlewar extends Thread {
 	/**
 	 *	
 	 */
-	private void waitForAll(){
+	private void waitForAll(MessageType msgType){
 		if (!this.iAmCoordinator()) 
 			throw new IllegalStateException("Error: only a coordinator can wait for all the others process");
 		
-		for (int i = 0; i < this.system.size(); i++ ) {
-			this.receiveFrom(i);
+		for (int i = 1; i < this.system.size(); i++ ) {
+			this.receiveFrom(i,msgType);
 		}
 	}
 
@@ -172,13 +179,13 @@ public class Middlewar extends Thread {
 	 */
 	public void barrier(){
 		if (this.iAmCoordinator()) {
-			// wait a barrier for the other process
-			// send a continue to all the process
-			this.sendAll("a continue message");
+			this.waitForAll(MessageType.BARRIER);
+			this.sendAll(MessageType.CONTINUE.toString()+ " " + this.barrierId + " " + this.procId + " ");
 		}else {
-			this.sendTo(this.coordinator,"barrier");
-			// whait for a continue
+			this.sendTo(this.coordinator,MessageType.BARRIER.toString() + " " + this.barrierId + " " +this.procId + " " );
+			this.receiveFrom(this.coordinator,MessageType.CONTINUE);
 		}	
+		this.barrierId ++;
 	}
 
 	/**
@@ -231,19 +238,26 @@ public class Middlewar extends Thread {
 	/**
 	 *	
 	 */
-	public synchronized String receiveFrom(int procNumber){
-		return this.dequeueMailFrom(procNumber);
+	public synchronized String receiveFrom(Integer procNumber, MessageType type){
+		return this.dequeueMailFrom(procNumber, type);
 	}
 
+	/**
+	 *	
+	 */
 	public void enqueueMail(String message){
+		BlockingQueue<String> queue = wherePut(message);
 		try{
-			this.getMailbox.put(message);
+			queue.put(message);
 		}catch(InterruptedException e){
 			System.out.println("Enqueue mail has failed");
 			e.printStackTrace();
 		}
 	}
 
+	/**
+	 *	
+	 */
 	private String dequeueMail(BlockingQueue<String> aMailbox){
 		String message = "";
 		try{
@@ -255,11 +269,15 @@ public class Middlewar extends Thread {
 		return message;
 	}
 
-	private String dequeueMailFrom(Integer id){
+	/**
+	 *	
+	 */
+	private String dequeueMailFrom(Integer id, MessageType type){
 		String message = "";
 		boolean find = false;
+		BlockingQueue<String> queue = wherePut(type);
 		while (!find) {
-			message = this.dequeueMail(this.getMailbox);
+			message = this.dequeueMail(queue);
 			String[] parsedMsg = Message.parse(message);
 			if (Message.whoSendIt(message) == id) {
 				find = true;
@@ -270,8 +288,35 @@ public class Middlewar extends Thread {
 		return message;
 	}
 
+	/**
+	 *	
+	 */
+	private BlockingQueue<String> wherePut(MessageType type){
+		BlockingQueue<String> queue = null;
+		switch (type) {
+			case GETR:
+				queue = this.getMailbox;
+				break;
+			case BARRIER:
+				queue = this.barrierMailbox;
+				break;
+			case CONTINUE:
+				queue = this.continueMailbox;
+				break;
+			default:
+				System.out.println("Panic !!! There is no queue for this kind of message: "+ type);
+				throw new IllegalStateException("Can not enqueue this kind of messages: " + type);
+		}
 
+		return queue;
+	}
 
+	/**
+	 *	
+	 */
+	private BlockingQueue<String> wherePut(String message){
+		return wherePut(Message.getType(message));
+	}
 
 
 }
