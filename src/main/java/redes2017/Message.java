@@ -26,6 +26,20 @@ public class Message{
 			return null;
 		}
 	}
+
+	public static Integer whoSendIt(String message){
+		Integer result = null;
+		switch (MessageType.valueOf(Message.getStringParam(message,0))) {
+			case GETR:
+				result = Message.getIntParam(message,2);
+				break;
+			case BARRIER;
+				result = 5555555;
+				break;
+			
+		}
+		return result;
+	}
 }
 
  

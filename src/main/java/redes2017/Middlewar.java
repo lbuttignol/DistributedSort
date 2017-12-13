@@ -49,9 +49,11 @@ public class Middlewar extends Thread {
 	private HashMap<String,DistributedArray> registry;
 
 	/**
-	 *	Message queue
+	 *	Message queue for GETR messages
 	 */
-	private BlockingQueue<String> mailbox;
+	private BlockingQueue<String> getMailbox;
+	private BlockingQueue<String> barrierMailbox;
+	private BlockingQueue<String> continueMailbox;
 
 	private static final Integer BUFFSIZE = 2048;
 
@@ -81,7 +83,10 @@ public class Middlewar extends Thread {
 		this.ear = new Listener(this);
 		this.ear.start();
 
-		this.mailbox = new LinkedBlockingQueue<String>();
+		this.getMailbox = new LinkedBlockingQueue<String>();
+		this.barrierMailbox = new LinkedBlockingQueue<String>();
+		this.continueMailbox = new LinkedBlockingQueue<String>();
+
 		this.registry = new HashMap<String,DistributedArray>();
 	}	
 
@@ -91,7 +96,6 @@ public class Middlewar extends Thread {
 	public void finish(){
 		this.ear.finish();
 		this.sendTo(this.procId, MessageType.END.toString() + " ");
-		// this.sendTo(this.procId, "END ");
 	}
 
 	/**
@@ -142,12 +146,24 @@ public class Middlewar extends Thread {
 	 *	The coordinator send a message to all the other process
 	 *	@param message to send
 	 */
-	public void sendAll(String message){
+	private void sendAll(String message){
 		if (!this.iAmCoordinator())
 			throw new IllegalStateException("Error: Someone trying to make a coordinator task, but does not have the rigths");
 		
-		for (int i = 1;i <= this.system.size() ; i++ ) {
+		for (int i = 1;i < this.system.size() ; i++ ) {
 			this.sendTo(i, message);
+		}
+	}
+
+	/**
+	 *	
+	 */
+	private void waitForAll(){
+		if (!this.iAmCoordinator()) 
+			throw new IllegalStateException("Error: only a coordinator can wait for all the others process");
+		
+		for (int i = 0; i < this.system.size(); i++ ) {
+			this.receiveFrom(i);
 		}
 	}
 
@@ -155,7 +171,6 @@ public class Middlewar extends Thread {
 	 *	the first process coordinates that everyone arrives at the barrier 
 	 */
 	public void barrier(){
-		// TO-DO
 		if (this.iAmCoordinator()) {
 			// wait a barrier for the other process
 			// send a continue to all the process
@@ -181,7 +196,6 @@ public class Middlewar extends Thread {
 	 *  @param message to send
 	 */
 	public void sendTo(Integer procNumber, String message){
-		
 		Process receiver = system.getProcess(procNumber);
 
 		byte[] sendData = new byte[BUFFSIZE];
@@ -200,7 +214,6 @@ public class Middlewar extends Thread {
 	 *	@return the message received 
 	 */
 	public String receive(){
-		
 		byte[] receiveData = new byte[BUFFSIZE];
 		DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
 		
@@ -222,26 +235,19 @@ public class Middlewar extends Thread {
 		return this.dequeueMailFrom(procNumber);
 	}
 
-	/**
-	 *	@return the message queue
-	 */
-	public BlockingQueue<String> getMailbox(){
-		return this.mailbox;
-	}
-
 	public void enqueueMail(String message){
 		try{
-			this.mailbox.put(message);
+			this.getMailbox.put(message);
 		}catch(InterruptedException e){
 			System.out.println("Enqueue mail has failed");
 			e.printStackTrace();
 		}
 	}
 
-	public String dequeueMail(){
+	private String dequeueMail(BlockingQueue<String> aMailbox){
 		String message = "";
 		try{
-			message = this.mailbox.take();
+			message = aMailbox.take();
 		}catch(InterruptedException e){
 			System.out.println("BlockingQueue take has fail");
 			e.printStackTrace();
@@ -249,13 +255,13 @@ public class Middlewar extends Thread {
 		return message;
 	}
 
-	public String dequeueMailFrom(Integer id){
+	private String dequeueMailFrom(Integer id){
 		String message = "";
 		boolean find = false;
 		while (!find) {
-			message = this.dequeueMail();
+			message = this.dequeueMail(this.getMailbox);
 			String[] parsedMsg = Message.parse(message);
-			if (Message.getIntParam(message,2) == id) {
+			if (Message.whoSendIt(message) == id) {
 				find = true;
 			}else {
 				this.enqueueMail(message);
