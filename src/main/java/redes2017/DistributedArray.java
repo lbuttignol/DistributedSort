@@ -19,7 +19,7 @@ public class DistributedArray{
 	/**
 	 *	List of elements on this part of the array  
 	 */
-	private Integer[] list;
+	private int[] list;
 
 	/**
 	 *	Number of parts that have the distributed array  
@@ -77,7 +77,7 @@ public class DistributedArray{
 		if(resto != 0 && this.secretary.iAmLast()){
 			this.localLength += this.resto;
 		}
-		this.list = new Integer[localLength];
+		this.list = new int[localLength];
 
 	}
 
@@ -193,15 +193,22 @@ public class DistributedArray{
 			finish = true;
 			this.internalSort();
 			this.secretary.barrier();
-
+			System.out.println("------------------------------------------------------pasamos barrier");
+			System.out.println("procID "+this.procId);
+			System.out.println("end "+ this.totalLength);
 			if (this.procId != this.totalLength-1) {
-				if (this.get(this.upperIndex(this.procId)).compareTo(this.get(this.lowerIndex(this.procId))) < 0) {
-					this.swap(this.upperIndex(this.procId),this.lowerIndex(this.procId));
+				System.out.println("------------------------------------------------------Puedo hacer swap con el siguiente");
+				System.out.println("ultimo de este arreglo "+this.get(this.upperIndex(this.procId)));
+				System.out.println("promero del próximo arreglo "+this.get(this.lowerIndex(this.procId + 1)));
+				System.out.println("compareto "+this.get(this.upperIndex(this.procId)).compareTo(this.get(this.lowerIndex(this.procId + 1))));
+				if (this.get(this.upperIndex(this.procId)).compareTo(this.get(this.lowerIndex(this.procId + 1))) > 0) {
+					System.out.println("------------------------------------------------------entramos al swap");
+					this.swap(this.upperIndex(this.procId),this.lowerIndex(this.procId + 1));
 					finish = false;
 				}
 			}
 
-			// finish = secretary.andReduce();
+			finish = secretary.andReduce(finish);
 		}
 
 	}

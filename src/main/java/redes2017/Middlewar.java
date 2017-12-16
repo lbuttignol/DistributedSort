@@ -54,11 +54,34 @@ public class Middlewar extends Thread {
 	private Integer barrierId;
 	
 	/**
+	 *	Reduce Id
+	 */
+	private Integer reduceId;
+	
+	/**
 	 *	Message queue for GETR messages
 	 */
 	private BlockingQueue<String> getMailbox;
+
+	/**
+	 *	Message queue for BARRIER messages
+	 */
 	private BlockingQueue<String> barrierMailbox;
+
+	/**
+	 *	Message queue for CONTINUE messages
+	 */
 	private BlockingQueue<String> continueMailbox;
+
+	/**
+	 *	Message queue for ANDREDUCE messages
+	 */
+	private BlockingQueue<String> andRedMailbox;
+
+	/**
+	 *	Message queue for ANDREDUCERSP messages
+	 */
+	private BlockingQueue<String> andRedRspMailbox;
 
 	private static final Integer BUFFSIZE = 2048;
 
@@ -89,10 +112,14 @@ public class Middlewar extends Thread {
 		this.ear.start();
 
 		this.barrierId = 0;
+		this.reduceId = 0;
 
-		this.getMailbox = new LinkedBlockingQueue<String>();
-		this.barrierMailbox = new LinkedBlockingQueue<String>();
-		this.continueMailbox = new LinkedBlockingQueue<String>();
+		this.getMailbox 	  = new LinkedBlockingQueue<String>();
+		this.barrierMailbox   = new LinkedBlockingQueue<String>();
+		this.continueMailbox  = new LinkedBlockingQueue<String>();
+		this.andRedMailbox 	  = new LinkedBlockingQueue<String>();
+		this.andRedRspMailbox = new LinkedBlockingQueue<String>();
+
 
 		this.registry = new HashMap<String,DistributedArray>();
 	}	
@@ -189,12 +216,39 @@ public class Middlewar extends Thread {
 	}
 
 	/**
+	 *	
+	 */
+	private Boolean waitForAllAndRed(MessageType msgType,Boolean aVariable){
+		if (!this.iAmCoordinator()) 
+			throw new IllegalStateException("Error: only a coordinator can wait for all the others process");
+		
+		for (int i = 1; i < this.system.size(); i++ ) {
+			System.out.println("wait for message from : "+ i);
+			String message = this.receiveFrom(i,msgType);
+			aVariable = aVariable && Message.getBoolean(message);
+		}
+		System.out.println("return from waitForAllAndRed");
+		return aVariable;
+	}
+
+	/**
 	 *	Find the value of a variable on every process and make an AND operation
 	 * 	@return True iff every process finish
 	 */
-	public boolean andReduce(){
-		//TO-DO
-		return false;
+	public Boolean andReduce(Boolean aVariable){
+		String rsp = null;
+		Boolean result;
+		if (this.iAmCoordinator()) {
+			result = this.waitForAllAndRed(MessageType.ANDREDUCE,aVariable);
+
+			this.sendAll(MessageType.ANDREDUCERSP.toString()+ " " + this.reduceId + " " + this.procId + " " + result.toString() + " ");
+		}else {
+			this.sendTo(this.coordinator,MessageType.ANDREDUCE.toString() + " " + this.reduceId + " " + this.procId + " " + aVariable.toString() + " " );
+			rsp = this.receiveFrom(this.coordinator,MessageType.ANDREDUCERSP);
+			result = Message.getBoolean(rsp);
+		}	
+		this.reduceId ++;
+		return result;
 	}	
 
 	/**
@@ -220,7 +274,7 @@ public class Middlewar extends Thread {
 	 * 	This method wait for a message.
 	 *	@return the message received 
 	 */
-	public String receive(){
+	public synchronized String receive(){
 		byte[] receiveData = new byte[BUFFSIZE];
 		DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
 		
@@ -302,6 +356,12 @@ public class Middlewar extends Thread {
 				break;
 			case CONTINUE:
 				queue = this.continueMailbox;
+				break;
+			case ANDREDUCE:
+				queue = this.andRedMailbox;
+				break;
+			case ANDREDUCERSP:
+				queue = this.andRedRspMailbox;
 				break;
 			default:
 				System.out.println("Panic !!! There is no queue for this kind of message: "+ type);

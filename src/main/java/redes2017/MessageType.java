@@ -6,7 +6,7 @@ public enum MessageType{
 
 	/**
 	 *	A GET message is to ask to someone a remote value, this message must have the 
-	 *  folowing structure (all message attributes must be separated by a space " "):
+	 *  following structure (all message attributes must be separated by a space " "):
 	 *
 	 *	GET arrayName  globalIndex  procSender
 	 */
@@ -14,7 +14,7 @@ public enum MessageType{
 
 	/**
 	 *	A GETR message is to answer a GET message, this message must have the 
-	 *	folowing structure (all message attributes must be separated by a space " "):
+	 *	following structure (all message attributes must be separated by a space " "):
 	 *
 	 *	GETR globalIndex  procSender  value
 	 */
@@ -22,15 +22,15 @@ public enum MessageType{
 
 	/**
 	 *	A SET message is to modify a remote value on the array, this message must
-	 *	have the folowing structure (all message attributes must be separated by a space " "):
+	 *	have the following structure (all message attributes must be separated by a space " "):
 	 *
 	 *	SET arrayName  globalIndex  value
 	 */
 	SET,
 	
 	/**
-	 *	A BARRIER message is to synchronise process execution, this message must
-	 *	have the folowing structure (all message attributes must be separated by a space " "):
+	 *	A BARRIER message is to synchronize process execution, this message must
+	 *	have the following structure (all message attributes must be separated by a space " "):
 	 *
 	 *	BARRIER barrierId  procSender 
 	 */ 
@@ -38,16 +38,29 @@ public enum MessageType{
 
 	/**
 	 *	A CONTINUE message is the answer to a BARRIER message, to continue the 
-	 *	program execution, this message nust have the following structure (all
+	 *	program execution, this message must have the following structure (all
 	 * 	message attributes must be separated by a space "");
 	 *
 	 *	CONTINUE  barrierId  procSender		
 	 */
 	CONTINUE,
 
-	// reduce 				hay que 
-	REDUCE,
-	// reduceresp n
-	REDUCERSP;
+	/**
+	 *	An ANDREDUCE message is to calculate a distributed AND form one variable
+	 * 	over remotes process, this message must have the following structure
+	 *  (all message attributes must be separated by a space "");
+	 *	
+	 *	ANDREDUCE  reduceId  procSender  booleanVariableValue
+	 */
+	ANDREDUCE,
+
+	/**
+	 *	An ANDREDUCERSP message is the answer to an ANDREDUCE message, this
+	 *	message must have the following structure (all message attributes must
+	 * 	be separated by a space "");
+	 *
+	 *	ANDREDUCERSP reduceId  procSender booleanResult
+	 */
+	ANDREDUCERSP;
 
 }

@@ -34,15 +34,15 @@ class App {
 
 
 		if (m0.whoAmI()== 0) {
-			a.set(0,5000);
+			a.set(0,5);
 			a.set(1,3000);
-			a.set(2,6000);
+			a.set(2,60);
 			a.set(3,45000);
 			a.set(4,6000);
-			a.set(5,2000);
-			a.set(6,140000);
+			a.set(5,200);
+			a.set(6,14);
 			a.set(7,1500);
-			a.set(8,10000);
+			a.set(8,1);
 			a.set(9,130000);
 			// a.set(10,7);
 
@@ -100,6 +100,7 @@ class App {
 
 		System.out.println("begin SORT!--------------------------------------------");
 		a.distributedSort();
+		System.out.println("end SORT!--------------------------------------------");
 
 		if (m0.whoAmI()== 0) {
 			// show all values

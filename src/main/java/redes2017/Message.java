@@ -50,6 +50,12 @@ public class Message{
 			case CONTINUE:
 				result = Message.getIntParam(message, 2);
 				break;
+			case ANDREDUCE:
+				result = Message.getIntParam(message, 2);
+				break;
+			case ANDREDUCERSP:
+				result = Message.getIntParam(message, 2);
+				break;
 			default: 
 				System.out.println("Panic !!! Message without sender");
 				throw new IllegalStateException("Can not find the sender on this kind of message");
@@ -62,7 +68,18 @@ public class Message{
 	 *	
 	 */
 	public static MessageType getType(String message){
-		return MessageType.valueOf(Message.getStringParam(message,0));
+		return MessageType.valueOf(Message.getStringParam(message, 0));
+	}
+
+	/**
+	 *	
+	 */
+	public static Boolean getBoolean(String message){
+		if (Message.getType(message) == MessageType.ANDREDUCE || Message.getType(message) == MessageType.ANDREDUCERSP) {
+			return new Boolean(Boolean.parseBoolean(Message.getStringParam(message, 3)));
+		}else {
+			throw new IllegalStateException("this kind of message do not have a boolean parameter");
+		}
 	}
 }
 

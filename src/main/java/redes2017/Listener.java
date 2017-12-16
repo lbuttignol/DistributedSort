@@ -72,16 +72,22 @@ public class Listener extends Thread{
 					arr.set(index,val);
 					break;
 
-				case BARRIER:System.out.println("is a barrier");
+				case BARRIER:
+					System.out.println("is a barrier");
+					this.master.enqueueMail(message);
 					break;
 
-				case CONTINUE: System.out.println("is a CONTINUE");
+				case CONTINUE:
+					System.out.println("is a CONTINUE");
+					this.master.enqueueMail(message);
 					break;
 
-				case REDUCE: System.out.println("is a REDUCE");
+				case ANDREDUCE: System.out.println("is a ANDREDUCE");
+					this.master.enqueueMail(message);
 					break;
 
-				case REDUCERSP: System.out.println("is a REDUCERSP");
+				case ANDREDUCERSP: System.out.println("is a ANDREDUCERSP");
+					this.master.enqueueMail(message);
 					break;
 
 				case END: System.out.println("Bye Bye");
