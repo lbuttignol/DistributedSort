@@ -1,8 +1,11 @@
 package redes2017;
-
+/**
+ *  This class has some static methods useful to handle messages
+ */
 public class Message{
     /**
-     *  
+     *  @param message to parse
+     *  @return a list of strings that results from parse the message.
      */
     public static String[] parse(String message){
         String delims = "[ ]+";
@@ -10,7 +13,9 @@ public class Message{
     }
 
     /**
-     *  
+     *  @param message to analyze
+     *  @param paramNum parameter to recover from message
+     *  @return the parameter paramNum from message as an Integer
      */
     public static Integer getIntParam(String message, Integer paramNum){
         String[] parsedMessage = Message.parse(message);
@@ -24,6 +29,9 @@ public class Message{
     }
 
     /**
+     *  @param message to analyze
+     *  @param paramNum parameter to recover from message
+     *  @return the parameter paramNum from message as a String
      *  
      */
     public static String getStringParam(String message, Integer paramNum){
@@ -36,7 +44,8 @@ public class Message{
     }
 
     /**
-     *  
+     *  @param message to analyze
+     *  @return the procId of message sender (if the message has a sender).
      */
     public static Integer whoSendIt(String message){
         Integer result = null;
@@ -57,14 +66,18 @@ public class Message{
     }
 
     /**
-     *  
+     *  @param message to analyze
+     *  @return The type of the message
      */
     public static MessageType getType(String message){
         return MessageType.valueOf(Message.getStringParam(message, 0));
     }
 
     /**
-     *  
+     *  @param message to analyze
+     *  @return Boolean value on the message, only ANDREDUCE and ANDREDUCERSP
+     *  has this function
+     *  @see MessageType.java
      */
     public static Boolean getBoolean(String message){
         if (   Message.getType(message) == MessageType.ANDREDUCE 

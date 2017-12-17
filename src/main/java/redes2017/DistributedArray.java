@@ -4,6 +4,9 @@ import java.lang.IndexOutOfBoundsException;
 import java.util.Arrays;
 import java.util.Collections;
 
+/**
+ *  This class represents a node on the distributed array
+ */
 public class DistributedArray{
     
     /**
