@@ -39,8 +39,6 @@ public class Listener extends Thread{
         
         while(!this.finish){
             String message = this.master.receive();
-            System.out.println("listener receive");
-            System.out.println(message);
 
             String arrayName;
             Integer index, val;
@@ -48,7 +46,7 @@ public class Listener extends Thread{
             Integer sender;
             switch (MessageType.valueOf(Message.getStringParam(message,0))) {
                 case GET: 
-                    System.out.println("is a GET");
+                    // System.out.println("is a GET");
                     arrayName = Message.getStringParam(message,1);
                     index = Message.getIntParam(message, 2);
                     sender = Message.getIntParam(message, 3);
@@ -58,7 +56,7 @@ public class Listener extends Thread{
                     break;
 
                 case SET: 
-                    System.out.println("is a SET");
+                    // System.out.println("is a SET");
                     arrayName = Message.getStringParam(message, 1);
                     index = Message.getIntParam(message, 2);
                     arr = this.master.getArray(arrayName);
@@ -67,27 +65,27 @@ public class Listener extends Thread{
                     break;
 
                 case GETR: 
-                    System.out.println("is a GETR");
+                    // System.out.println("is a GETR");
                     this.master.enqueueMail(message);
                     break;
 
                 case BARRIER:
-                    System.out.println("is a BARRIER");
+                    // System.out.println("is a BARRIER");
                     this.master.enqueueMail(message);
                     break;
 
                 case CONTINUE:
-                    System.out.println("is a CONTINUE");
+                    // System.out.println("is a CONTINUE");
                     this.master.enqueueMail(message);
                     break;
 
                 case ANDREDUCE: 
-                    System.out.println("is a ANDREDUCE");
+                    // System.out.println("is a ANDREDUCE");
                     this.master.enqueueMail(message);
                     break;
 
                 case ANDREDUCERSP: 
-                    System.out.println("is a ANDREDUCERSP");
+                    // System.out.println("is a ANDREDUCERSP");
                     this.master.enqueueMail(message);
                     break;
 

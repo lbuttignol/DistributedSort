@@ -98,7 +98,6 @@ public class Middlewar extends Thread {
      *  @param  info to the other nodes
      */
     public Middlewar(Integer procNumber, DistSystem info) {
-        System.out.println("Starting Middlewar " + procNumber);
         this.procId = procNumber;
         this.system = info;
         try{
@@ -197,7 +196,6 @@ public class Middlewar extends Thread {
             throw new IllegalStateException("Error: only a coordinator can wait for all the others process");
         
         for (int i = 1; i < this.system.size(); i++ ) {
-            System.out.println("Waiting for messages");
             this.receiveFrom(i,msgType);
         }
     }
@@ -206,15 +204,11 @@ public class Middlewar extends Thread {
      *  the first process coordinates that everyone arrives at the barrier 
      */
     public void barrier(){
-        System.out.println("In the barrier");
         if (this.iAmCoordinator()) {
-            System.out.println("Iam the coordinator");
             this.waitForAll(MessageType.BARRIER);
             this.sendAll(MessageType.CONTINUE.toString()+ " " + this.barrierId + " " + this.procId + " ");
         }else {
-            System.out.println("Iam the other");
             this.sendTo(this.coordinator,MessageType.BARRIER.toString() + " " + this.barrierId + " " +this.procId + " " );
-            System.out.println("message sent");
             this.receiveFrom(this.coordinator,MessageType.CONTINUE);
         }   
         this.barrierId ++;
@@ -228,11 +222,9 @@ public class Middlewar extends Thread {
             throw new IllegalStateException("Error: only a coordinator can wait for all the others process");
         
         for (int i = 1; i < this.system.size(); i++ ) {
-            System.out.println("wait for message from : "+ i);
             String message = this.receiveFrom(i,msgType);
             aVariable = aVariable && Message.getBoolean(message);
         }
-        System.out.println("return from waitForAllAndRed");
         return aVariable;
     }
 
@@ -304,8 +296,8 @@ public class Middlewar extends Thread {
     /**
      *  
      */
-    public synchronized void enqueueMail(String message){
-        BlockingQueue<String> queue = wherePut(message);
+    public void enqueueMail(String message){
+        BlockingQueue<String> queue = getQueue(message);
         try{
             queue.put(message);
         }catch(InterruptedException e){
@@ -317,8 +309,7 @@ public class Middlewar extends Thread {
     /**
      *  
      */
-    private synchronized String dequeueMail(BlockingQueue<String> aMailbox){
-        System.out.println("en desencolar");
+    private String dequeueMail(BlockingQueue<String> aMailbox){
         String message = "";
         try{
             message = aMailbox.take();
@@ -332,15 +323,12 @@ public class Middlewar extends Thread {
     /**
      *  
      */
-    private synchronized String dequeueMailFrom(Integer id, MessageType type){
-        System.out.println("en desencolarfrom ");
+    private String dequeueMailFrom(Integer id, MessageType type){
         String message = "";
         boolean find = false;
-        BlockingQueue<String> queue = wherePut(type);
+        BlockingQueue<String> queue = getQueue(type);
         while (!find) {
-
             message = this.dequeueMail(queue);
-            String[] parsedMsg = Message.parse(message);
             if (Message.whoSendIt(message) == id) {
                 find = true;
             }else {
@@ -353,23 +341,27 @@ public class Middlewar extends Thread {
     /**
      *  
      */
-    private synchronized  BlockingQueue<String> wherePut(MessageType type){
-        System.out.println("wherePut");
+    private  BlockingQueue<String> getQueue(MessageType type){
         BlockingQueue<String> queue = null;
         switch (type) {
             case GETR:
+                // System.out.println("GETR");
                 queue = this.getMailbox;
                 break;
             case BARRIER:
+                // System.out.println("BARRIER");
                 queue = this.barrierMailbox;
                 break;
             case CONTINUE:
+                // System.out.println("CONTINUE");
                 queue = this.continueMailbox;
                 break;
             case ANDREDUCE:
+                // System.out.println("ANDREDUCE");
                 queue = this.andRedMailbox;
                 break;
             case ANDREDUCERSP:
+                // System.out.println("ANDREDUCERSP");
                 queue = this.andRedRspMailbox;
                 break;
             default:
@@ -383,8 +375,8 @@ public class Middlewar extends Thread {
     /**
      *  
      */
-    private synchronized BlockingQueue<String> wherePut(String message){
-        return wherePut(Message.getType(message));
+    private BlockingQueue<String> getQueue(String message){
+        return getQueue(Message.getType(message));
     }
 
 

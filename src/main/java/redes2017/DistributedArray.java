@@ -64,7 +64,6 @@ public class DistributedArray{
         //name treatment
         this.name = "a" + this.counter.toString();
         this.counter++;
-        // System.out.println(this.name);
 
         // bind this array on the middlewar
         this.secretary.bind(this.name,this);
@@ -138,9 +137,8 @@ public class DistributedArray{
             throw new IndexOutOfBoundsException("Index out of bound on get");
         }
         if(!this.isHere(index)){
-
             this.secretary.sendTo(this.whoGotIt(index) , MessageType.GET.toString() +" " + this.name + " " + index.toString() + " " + this.procId + " " );
-            String message = this.secretary.receiveFrom(this.whoGotIt(index),MessageType.GETR);
+            String message = this.secretary.receiveFrom(this.whoGotIt(index), MessageType.GETR);
             return Message.getIntParam(message,3);
         }
         return this.list[index - this.lowerIndex(this.procId)];
@@ -151,15 +149,15 @@ public class DistributedArray{
      *  @return the lower index on this process
      */ 
     private Integer lowerIndex(Integer procId){
-        return this.procId * this.totalLength / this.partitions;
+        return procId * this.totalLength / this.partitions;
     }
 
-
+    /**
      *  @param procId Integer that represents a process 
      *  @return the higher index on this process
      */
     private Integer upperIndex(Integer procId){ 
-        return this.procId * this.totalLength / this.partitions + this.localLength - 1;
+        return procId * this.totalLength / this.partitions + this.localLength - 1;
     }
 
     /**
@@ -175,11 +173,14 @@ public class DistributedArray{
      *  @param e0 global index to swap
      *  @param e1 globat index to swap
      */
-    public synchronized void swap(Integer e0,Integer e1) {
-        Integer aux0 = this.get(e0);
-        Integer aux1 = this.get(e1);
-        this.set(e1, aux0);
-        this.set(e0, aux1);
+    public void swap(Integer e0,Integer e1) {
+        synchronized (this){
+            Integer aux0 = this.get(e0);
+            Integer aux1 = this.get(e1);
+            this.set(e1, aux0);
+            this.set(e0, aux1);
+
+        }
     }   
 
     public void distributedSort() {
@@ -188,24 +189,13 @@ public class DistributedArray{
     //  *   Global variable of the system, should be access sysnchonized
     //  */      
         this.secretary.barrier();
-            System.out.println("------------------------------------------------------start");
         boolean finish = false;
         while (! finish) {
             finish = true;
-            System.out.println("------------------------------------------------------internalSort");
             this.internalSort();
-            System.out.println("------------------------------------------------------end internalSort");
             this.secretary.barrier();
-            System.out.println("------------------------------------------------------pasamos barrier");
-            System.out.println("procID "+this.procId);
-            System.out.println("end "+ this.totalLength);
-            if (this.procId != this.totalLength-1) {
-                System.out.println("------------------------------------------------------Puedo hacer swap con el siguiente");
-                System.out.println("ultimo de este arreglo "+this.get(this.upperIndex(this.procId)));
-                System.out.println("promero del próximo arreglo "+this.get(this.lowerIndex(this.procId + 1)));
-                System.out.println("compareto "+this.get(this.upperIndex(this.procId)).compareTo(this.get(this.lowerIndex(this.procId + 1))));
+            if (this.procId != this.partitions-1) {
                 if (this.get(this.upperIndex(this.procId)).compareTo(this.get(this.lowerIndex(this.procId + 1))) > 0) {
-                    System.out.println("------------------------------------------------------entramos al swap");
                     this.swap(this.upperIndex(this.procId),this.lowerIndex(this.procId + 1));
                     finish = false;
                 }
