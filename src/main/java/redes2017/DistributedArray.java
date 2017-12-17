@@ -7,42 +7,48 @@ import java.util.Collections;
 public class DistributedArray{
     
     /**
-     *  Total length of the distributed array
+     *  Total length of the distributed array, has the number of elements that
+     *  the Distributed array could contains.
      */
     private Integer totalLength;
 
     /**
-     *  Elements on this part of the distributed array  
+     *  Local length, local array size on this node of the distributed array 
      */
     private Integer localLength;
 
     /**
-     *  List of elements on this part of the array  
+     *  list store the elements of this distributed array node  
      */
     private int[] list;
 
     /**
-     *  Number of parts that have the distributed array  
+     *  Number of nodes that build this distributed array  
      */
     private Integer partitions;
 
     /**
-     *  This number indicate the order of this partition on the global array  
+     *  Node number, process id or partition number. Has the node number on this
+     *  system, start on 0 until this.partitions - 1
      */
     private Integer procId;
 
     /**
-     *  Quantity of elements added to the last partition 
+     *  Elements added to the last partition. This are used to resolve the 
+     *  problem of this.totalLength % this.partitions != 0. These elements are
+     *  added on the last partition of the distributed array.
      */
     private Integer resto;
 
     /**
-     *  Internal name of the array, this shoild be unique. 
+     *  Internal name of the array, this should be unique. Used to bind it with
+     *  the middlewar. 
      */
     private String name;
 
     /**
-     *  Counter of DistributedArray instances. This is for create the name of the instance. 
+     *  Counter of DistributedArray instances. This is used to create the name 
+     *  of the instance. 
      */
     private static Integer counter = 0;
 
@@ -53,8 +59,8 @@ public class DistributedArray{
 
     /**
      *  Distributed Array constructor
-     *  @param Values size of the array
-     *  @param 
+     *  @param size of the array
+     *  @param mid the middlewar that assist to this instance of distributed array
      */
     public DistributedArray(Integer size, Middlewar mid ){
         this.secretary   = mid;
@@ -82,7 +88,7 @@ public class DistributedArray{
 
     /**
      *  @param index on the Distributed Array
-     *  @retrun True iff the given index is on this part of the array
+     *  @return True iff the given index is on this node of the array
      */
     private boolean isHere(Integer index){
         return index >= this.lowerIndex(this.procId) && index <= this.upperIndex(this.procId);
@@ -145,24 +151,23 @@ public class DistributedArray{
     }
 
     /**
-     *  @param procId Integer that represents a process 
-     *  @return the lower index on this process
+     *  @param procId Integer that represents a distributed array node 
+     *  @return the first global index that has the node procId
      */ 
     private Integer lowerIndex(Integer procId){
         return procId * this.totalLength / this.partitions;
     }
 
     /**
-     *  @param procId Integer that represents a process 
-     *  @return the higher index on this process
+     *  @param procId Integer that represents a distributed array node 
+     *  @return the last global index that has the node procId
      */
     private Integer upperIndex(Integer procId){ 
         return procId * this.totalLength / this.partitions + this.localLength - 1;
     }
 
     /**
-     *  Sort the array memory available on the process
-     *  @param procId Integer that represents a process 
+     *  Sort the array memory available on the distributed array node
      */
     public void internalSort(){
         Arrays.sort(this.list);
@@ -171,7 +176,7 @@ public class DistributedArray{
     /**
      *  Swap two elements on the Array
      *  @param e0 global index to swap
-     *  @param e1 globat index to swap
+     *  @param e1 global index to swap
      */
     public void swap(Integer e0,Integer e1) {
         synchronized (this){
@@ -183,11 +188,11 @@ public class DistributedArray{
         }
     }   
 
+    /**
+     *  Sort the distributed array from the smaller to the higher
+     */
     public void distributedSort() {
-    // /**
-    //  *   True iff the distributed system is finished.
-    //  *   Global variable of the system, should be access sysnchonized
-    //  */      
+          
         this.secretary.barrier();
         boolean finish = false;
         while (! finish) {
@@ -207,7 +212,7 @@ public class DistributedArray{
     }
 
     /**
-     *
+     *  Array node toString
      */
     @Override
     public String toString(){

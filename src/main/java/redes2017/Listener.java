@@ -12,7 +12,9 @@ public class Listener extends Thread{
      */
     private Middlewar master;
 
-
+    /**
+     *  Used to make that the listener end his task.
+     */
     private boolean finish;
 
     /**
