@@ -13,18 +13,18 @@ import java.util.HashMap;
 import java.lang.InterruptedException;
 
 /**
- *  A middlewar is responsable for the comminucation of a distributed node.
- *  Shuld kmow completely the system    
+ *  A middlewar is responsable for the communication of a distributed node.
+ *  Should know completely the system to establish all the communication    
  */
 public class Middlewar extends Thread {
 
     /**
-     *  Number of the process.
+     *  Process identification number.
      */
     private Integer procId;
 
     /**
-     *  Distributed system Information. 
+     *  Distributed system information. Know process quantity and his location. 
      */
     private DistSystem system;
 
@@ -34,7 +34,7 @@ public class Middlewar extends Thread {
     private DatagramSocket socket;
 
     /**
-     *  Thread that listen every message
+     *  Thread that listen and deliver every message
      */
     private Listener ear;
 
@@ -44,53 +44,46 @@ public class Middlewar extends Thread {
     private static Integer coordinator = 0;
 
     /**
-     *  Contains the info of the DistributedArrays that can call
+     *  Contains the info of the arrays that can call
      */
     private HashMap<String,DistributedArray> registry;
 
     /**
-     *  Barrier Id
+     *  Barrier identification number 
      */
     private Integer barrierId;
     
     /**
-     *  Reduce Id
+     *  Reduce identification number 
      */
     private Integer reduceId;
     
     /**
-     *  Message queue for GETR messages
+     *  Queue for GETR messages
      */
     private BlockingQueue<String> getMailbox;
 
     /**
-     *  Message queue for BARRIER messages
+     *  Queue for BARRIER messages
      */
     private BlockingQueue<String> barrierMailbox;
 
     /**
-     *  Message queue for CONTINUE messages
+     *  Queue for CONTINUE messages
      */
     private BlockingQueue<String> continueMailbox;
 
     /**
-     *  Message queue for ANDREDUCE messages
+     *  Queue for ANDREDUCE messages
      */
     private BlockingQueue<String> andRedMailbox;
 
     /**
-     *  Message queue for ANDREDUCERSP messages
+     *  Queue for ANDREDUCERSP messages
      */
     private BlockingQueue<String> andRedRspMailbox;
 
     private static final Integer BUFFSIZE = 2048;
-
-    /**
-     *  
-     */
-    public DistSystem getSys(){
-        return this.system;
-    }
 
     /**
      *  Default constructor of Middlewar
@@ -124,7 +117,15 @@ public class Middlewar extends Thread {
     }   
 
     /**
-     *  This method autosend an especial message to finish the listener
+     *  @return the info of the system
+     */
+    public DistSystem getSys(){
+        return this.system;
+    }
+
+    /**
+     *  This method auto send an especial message to finish the listener loop 
+     *  and end the process.
      */ 
     public void finish(){
         this.ear.finish();
@@ -132,7 +133,9 @@ public class Middlewar extends Thread {
     }
 
     /**
-     *  Add an entry to the regisrty of arrays handled by this middlewar
+     *  Add an entry to the registry of arrays handled by this middlewar.
+     *  @param name, internal array name to bind on this middlewar.
+     *  @param ref, distributed array to store.
      */
     public void bind(String name, DistributedArray ref){
         this.registry.put(name,ref);
@@ -144,13 +147,6 @@ public class Middlewar extends Thread {
      */
     public DistributedArray getArray(String name){
         return this.registry.get(name);
-    }
-
-    /**
-     *  @return True: iff this instance coordinate all the tasks
-     */
-    private boolean iAmCoordinator(){
-        return this.procId == this.coordinator;
     }
 
     /**
@@ -176,32 +172,12 @@ public class Middlewar extends Thread {
     }
 
     /**
-     *  The coordinator send a message to all the other process
-     *  @param message to send
-     */
-    private void sendAll(String message){
-        if (!this.iAmCoordinator())
-            throw new IllegalStateException("Error: Someone trying to make a coordinator task, but does not have the rigths");
-        
-        for (int i = 1;i < this.system.size() ; i++ ) {
-            this.sendTo(i, message);
-        }
-    }
-
-    /**
-     *  
-     */
-    private void waitForAll(MessageType msgType){
-        if (!this.iAmCoordinator()) 
-            throw new IllegalStateException("Error: only a coordinator can wait for all the others process");
-        
-        for (int i = 1; i < this.system.size(); i++ ) {
-            this.receiveFrom(i,msgType);
-        }
-    }
-
-    /**
-     *  the first process coordinates that everyone arrives at the barrier 
+     *  Is a synchronization method. The coordinator, coordinates that everyone
+     *  arrives at the barrier waiting for BARRIER messages, when all the messages
+     *  are received, then the coordinator send a CONTINUE message to all the 
+     *  nodes to follow the execution. If a no coordinator process run this method
+     *  then send a BARRIER message to the coordinator and then wait for a CONTINUE
+     *  message from the coordinator.
      */
     public void barrier(){
         if (this.iAmCoordinator()) {
@@ -215,22 +191,10 @@ public class Middlewar extends Thread {
     }
 
     /**
-     *  
-     */
-    private Boolean waitForAllAndRed(MessageType msgType,Boolean aVariable){
-        if (!this.iAmCoordinator()) 
-            throw new IllegalStateException("Error: only a coordinator can wait for all the others process");
-        
-        for (int i = 1; i < this.system.size(); i++ ) {
-            String message = this.receiveFrom(i,msgType);
-            aVariable = aVariable && Message.getBoolean(message);
-        }
-        return aVariable;
-    }
-
-    /**
-     *  Find the value of a variable on every process and make an AND operation
-     *  @return True iff every process finish
+     *  Search a value of a boolean variable and make an AND operation, then 
+     *  return the AND result.
+     *  @param aVariable boolean variable to make a remote AND.
+     *  @return True iff aVariable is true on every node.
      */
     public Boolean andReduce(Boolean aVariable){
         String rsp = null;
@@ -287,14 +251,18 @@ public class Middlewar extends Thread {
     }
 
     /**
-     *  
+     *  This method wait for a specific message from procNumber
+     *  @param procNumber message sender
+     *  @param type kind of message to receive.
+     *  @return the message received from procNumber. 
      */
     public String receiveFrom(Integer procNumber, MessageType type){
         return this.dequeueMailFrom(procNumber, type);
     }
 
     /**
-     *  
+     *  Put a message on his queue
+     *  @param message to enqueue
      */
     public void enqueueMail(String message){
         BlockingQueue<String> queue = getQueue(message);
@@ -307,7 +275,61 @@ public class Middlewar extends Thread {
     }
 
     /**
-     *  
+     *  @return True: iff this instance coordinate all the tasks that requires
+     *  a coordinator process  
+     */
+    private boolean iAmCoordinator(){
+        return this.procId == this.coordinator;
+    }
+
+    /**
+     *  The coordinator send a message to all the other process
+     *  @param message to send
+     */
+    private void sendAll(String message){
+        if (!this.iAmCoordinator())
+            throw new IllegalStateException("Error: Someone trying to make a coordinator task, but does not have the rigths");
+        
+        for (int i = 1;i < this.system.size() ; i++ ) {
+            this.sendTo(i, message);
+        }
+    }
+
+    /**
+     *  This method suspend the coordinator thread until all the nodes sends to
+     *  the coordinator a msgType message
+     *  @param msgType kind of message to wait from all the nodes.
+     */
+    private void waitForAll(MessageType msgType){
+        if (!this.iAmCoordinator()) 
+            throw new IllegalStateException("Error: only a coordinator can wait for all the others process");
+        
+        for (int i = 1; i < this.system.size(); i++ ) {
+            this.receiveFrom(i,msgType);
+        }
+    }
+
+    /**
+     *  A version of waitForAll to the andReduce method. Wait for a message 
+     *  from all the nodes that contains a boolean variable, and make and AND
+     *  with this results
+     *  @return true iff aVariable is true and all the message has a true parameter
+     */
+    private Boolean waitForAllAndRed(MessageType msgType,Boolean aVariable){
+        if (!this.iAmCoordinator()) 
+            throw new IllegalStateException("Error: only a coordinator can wait for all the others process");
+        
+        for (int i = 1; i < this.system.size(); i++ ) {
+            String message = this.receiveFrom(i,msgType);
+            aVariable = aVariable && Message.getBoolean(message);
+        }
+        return aVariable;
+    }
+
+    /**
+     *  Given a queue, take a message from it an return this message
+     *  @param aMailbox queue to use.
+     *  @return a message from aMailbox queue
      */
     private String dequeueMail(BlockingQueue<String> aMailbox){
         String message = "";
@@ -321,7 +343,11 @@ public class Middlewar extends Thread {
     }
 
     /**
-     *  
+     *  This method dequeue messages until find one sent by id, if the message
+     *  dequeue do not came from id then enqueue it again.
+     *  @param id of the sender expected 
+     *  @param type of the message expected
+     *  @return a type message prom id 
      */
     private String dequeueMailFrom(Integer id, MessageType type){
         String message = "";
@@ -339,7 +365,9 @@ public class Middlewar extends Thread {
     }
 
     /**
-     *  
+     *  Given a MessageType return the queue where put or take this kind of message
+     *  @param essageType to enqueue or dequeue     
+     *  @return the queue that has this message type
      */
     private  BlockingQueue<String> getQueue(MessageType type){
         BlockingQueue<String> queue = null;
@@ -373,7 +401,9 @@ public class Middlewar extends Thread {
     }
 
     /**
-     *  
+     *  Given a message return the queue where put or take this kind of message
+     *  @param message to enqueue
+     *  @return a queue where puts this kind of message
      */
     private BlockingQueue<String> getQueue(String message){
         return getQueue(Message.getType(message));
