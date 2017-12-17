@@ -2,14 +2,28 @@ package redes2017;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-
+/**
+ *  This class represents a Process on the system, with all the info to make
+ *  possible the communication.
+ */
 public class Process {
+    /**
+     *  Number of the process
+     */
     private Integer id;
+    
+    /**
+     *  Ip address to could send an receive messages from the outside
+     */
     private InetAddress ip;
+
+    /**
+     *  Port where are listening this process
+     */
     private Integer port;
 
     /**
-     *  Contructor of Process with default IP
+     *  Constructor of Process with default IP
      *  @param id the number of the Process
      *  @param ip the ip address of the process
      *  @param port the port to make communication 
@@ -21,7 +35,7 @@ public class Process {
     }
 
     /**
-     *  Contructor of Process with default IP
+     *  Constructor of Process with default IP
      *  @param id the number of the Process
      *  @param port the port to make communication 
      */
