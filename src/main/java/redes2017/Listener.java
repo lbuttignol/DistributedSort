@@ -15,7 +15,7 @@ public class Listener extends Thread{
     /**
      *  Used to make that the listener end his task.
      */
-    private boolean finish;
+    private volatile boolean finish;
 
     /**
      *  Default constructor of a Listener
@@ -91,7 +91,9 @@ public class Listener extends Thread{
                     this.master.enqueueMail(message);
                     break;
 
-                case END: System.out.println("Bye Bye");
+                case END: 
+                    // System.out.println("Bye Bye");
+                    this.finish = false;
                     break;
 
                 default:    System.out.println("Panic! on the Listener");

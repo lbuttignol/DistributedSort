@@ -126,12 +126,14 @@ public class DistributedArray{
      *  @param index to set on the array 
      *  @param val value to put on the index 
      */
-    public synchronized void set(Integer index, Integer val){
+    public void set(Integer index, Integer val){
         if (!this.rightIndex(index)) {
             throw new IndexOutOfBoundsException("Index out of bound on set");
         }
         if(!this.isHere(index)) {
-            this.secretary.sendTo(this.whoGotIt(index), MessageType.SET.toString() + " " + this.name + " " + index + " " + val + " ");
+            synchronized (this){
+                this.secretary.sendTo(this.whoGotIt(index), MessageType.SET.toString() + " " + this.name + " " + index + " " + val + " ");
+            }
         }else {
             this.list[index - this.lowerIndex(this.procId)] = val;
         }
@@ -141,14 +143,17 @@ public class DistributedArray{
      *  @param index Integer that represent a position on the array.
      *  @return the value on the given index.
      */
-    public synchronized Integer get(Integer index){
+    public Integer get(Integer index){
         if (!this.rightIndex(index)) {
             throw new IndexOutOfBoundsException("Index out of bound on get");
         }
+
         if(!this.isHere(index)){
-            this.secretary.sendTo(this.whoGotIt(index) , MessageType.GET.toString() +" " + this.name + " " + index.toString() + " " + this.procId + " " );
-            String message = this.secretary.receiveFrom(this.whoGotIt(index), MessageType.GETR);
-            return Message.getIntParam(message,3);
+            synchronized(this){
+                this.secretary.sendTo(this.whoGotIt(index) , MessageType.GET.toString() +" " + this.name + " " + index.toString() + " " + this.procId + " " );
+                String message = this.secretary.receiveFrom(this.whoGotIt(index), MessageType.GETR);
+                return Message.getIntParam(message,3);
+            }   
         }
         return this.list[index - this.lowerIndex(this.procId)];
     }
@@ -172,7 +177,7 @@ public class DistributedArray{
     /**
      *  Sort the array memory available on the distributed array node
      */
-    public void internalSort(){
+    private void internalSort(){
         Arrays.sort(this.list);
     }
 
@@ -182,20 +187,19 @@ public class DistributedArray{
      *  @param e1 global index to swap
      */
     public void swap(Integer e0,Integer e1) {
-        synchronized (this){
+        // synchronized (this){
             Integer aux0 = this.get(e0);
             Integer aux1 = this.get(e1);
             this.set(e1, aux0);
             this.set(e0, aux1);
 
-        }
+        // }
     }   
 
     /**
      *  Sort the distributed array from the smaller to the higher
      */
     public void distributedSort() {
-          
         this.secretary.barrier();
         boolean finish = false;
         while (! finish) {
@@ -203,6 +207,11 @@ public class DistributedArray{
             this.internalSort();
             this.secretary.barrier();
             if (this.procId != this.partitions-1) {
+                Integer aux0,aux1,aux2,aux3;
+                aux0=this.upperIndex(this.procId);
+                aux1=this.lowerIndex(this.procId+1);
+                aux2=this.get(aux0);
+                aux3=this.get(aux1);
                 if (this.get(this.upperIndex(this.procId)).compareTo(this.get(this.lowerIndex(this.procId + 1))) > 0) {
                     this.swap(this.upperIndex(this.procId),this.lowerIndex(this.procId + 1));
                     finish = false;
@@ -219,13 +228,25 @@ public class DistributedArray{
      */
     @Override
     public String toString(){
-        return  "Array name "    + this.name + "\n" +
-                "global length " + this.totalLength + "\n" +
-                "local length "  + this.localLength + "\n" +
-                "node number "   + this.procId + "\n" +
-                "list length "   + this.list.length + "\n" ;
+        return  "Array Name "    + this.name + "\n" +
+                "Global Length " + this.totalLength + "\n" +
+                "Local Length "  + this.localLength + "\n" +
+                "Node Number "   + this.procId + "\n" +
+                "List Length "   + this.list.length + "\n" +
+                "Lower Index "   + this.lowerIndex(this.procId) + "\n" +
+                "Lower Index "   + this.get(this.lowerIndex(this.procId)) + "\n" +
+                "Upper Index "   + this.upperIndex(this.procId) + "\n" +
+                "Upper Index "   + this.get(this.upperIndex(this.procId)) + "\n" +
+                "List = "        + this.aux() ;
     }
 
+    private String aux(){
+        String result ="";
+        for (int i=0; i<this.localLength; i++) {
+            result = result + list[i] + "\n";
+        }
+        return result;
+    }
     
 
 }

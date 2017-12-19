@@ -124,12 +124,15 @@ public class Middlewar extends Thread {
     }
 
     /**
-     *  This method auto send an especial message to finish the listener loop 
+     *  This method send an especial message to finish the listener loop 
      *  and end the process.
      */ 
     public void finish(){
-        this.ear.finish();
-        this.sendTo(this.procId, MessageType.END.toString() + " ");
+        this.barrier();
+        if (this.iAmCoordinator()) {
+            this.sendAll( MessageType.END.toString() + " ");
+            ear.finish();
+        }
     }
 
     /**
@@ -373,23 +376,23 @@ public class Middlewar extends Thread {
         BlockingQueue<String> queue = null;
         switch (type) {
             case GETR:
-                // System.out.println("GETR");
+                // System.out.println("GETR MAILBOX");
                 queue = this.getMailbox;
                 break;
             case BARRIER:
-                // System.out.println("BARRIER");
+                // System.out.println("BARRIER MAILBOX");
                 queue = this.barrierMailbox;
                 break;
             case CONTINUE:
-                // System.out.println("CONTINUE");
+                // System.out.println("CONTINUE MAILBOX");
                 queue = this.continueMailbox;
                 break;
             case ANDREDUCE:
-                // System.out.println("ANDREDUCE");
+                // System.out.println("ANDREDUCE MAILBOX");
                 queue = this.andRedMailbox;
                 break;
             case ANDREDUCERSP:
-                // System.out.println("ANDREDUCERSP");
+                // System.out.println("ANDREDUCERSP MAILBOX");
                 queue = this.andRedRspMailbox;
                 break;
             default:
