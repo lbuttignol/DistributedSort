@@ -11,7 +11,7 @@ mvn compile
 
 *To execute the project, run:*
 
-mvn exec:java -Dexec.args="number_of_instance_to_run"
+mvn exec:java -Dexec.args="<node-numbers> <array-length> <number-of-instance-to-run>"
 
 
 # Project Structure (In Spanish for the moment) # 
