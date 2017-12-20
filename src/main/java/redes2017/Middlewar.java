@@ -128,10 +128,12 @@ public class Middlewar extends Thread {
      *  and end the process.
      */ 
     public void finish(){
+
         this.barrier();
         if (this.iAmCoordinator()) {
             this.sendAll( MessageType.END.toString() + " ");
             ear.finish();
+            this.sendTo(this.procId,  MessageType.END.toString() + " ");
         }
     }
 

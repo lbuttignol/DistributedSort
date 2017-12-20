@@ -93,7 +93,7 @@ public class Listener extends Thread{
 
                 case END: 
                     // System.out.println("Bye Bye");
-                    this.finish = false;
+                    this.finish = true;
                     break;
 
                 default:    System.out.println("Panic! on the Listener");
