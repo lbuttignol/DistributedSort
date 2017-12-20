@@ -186,14 +186,12 @@ public class DistributedArray{
      *  @param e0 global index to swap
      *  @param e1 global index to swap
      */
-    public void swap(Integer e0,Integer e1) {
-        // synchronized (this){
+    private void swap(Integer e0,Integer e1) {
             Integer aux0 = this.get(e0);
             Integer aux1 = this.get(e1);
             this.set(e1, aux0);
             this.set(e0, aux1);
 
-        // }
     }   
 
     /**

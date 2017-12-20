@@ -30,7 +30,11 @@ public class Process {
      */
     public Process(Integer id, String ip, Integer port){
         this.id = id;
-        // this.ip = new InetAddress(ip );
+        try{
+            this.ip = InetAddress.getByName(ip);
+        }catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
         this.port = port;
     }
 

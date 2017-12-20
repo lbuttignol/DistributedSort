@@ -1,8 +1,15 @@
 package redes2017;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+
 /**
  *  Have the info of the distributed system, this calss know every node and
  *  the information to communicate with everyone on this distributed system.
@@ -14,6 +21,8 @@ public class DistSystem {
      */
     private LinkedList<Process> sys;
 
+    private static final String FILENAME = "configutation.txt";
+
     /**
      *  Default constructor of a distribute system
      *  @param procNum. Size of the distributed system
@@ -21,9 +30,25 @@ public class DistSystem {
     public DistSystem(Integer procNum){
         this.sys = new LinkedList<Process>();
 
-        for (int i = 0; i < procNum; i++) {
-            this.sys.add(new Process(i,5000+i));
+        BufferedReader br = null;
+        String[] params = null ;
+        try{
+            br = new BufferedReader(new FileReader(FILENAME));
+            
+            String contentLine = br.readLine();
+
+            for (int i = 0; i < procNum && contentLine != null; i++) {
+                String delims = "[ ]+";
+                params = contentLine.split(delims);
+                this.sys.add(new Process(i,params[0],Integer.parseInt(params[1])));
+                contentLine = br.readLine();
+            }
+        
+        }catch (IOException e) {
+            e.printStackTrace();
         }
+
+
     }
 
     /**
